@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mind Reader</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a0a;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+
+    .status {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 40px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .status.connected { color: #2ecc71; }
+    .status.waiting { color: #888; }
+
+    .label {
+      font-size: 14px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #444;
+      margin-bottom: 20px;
+    }
+
+    #word-display {
+      font-size: 100px;
+      font-weight: bold;
+      color: #fff;
+      letter-spacing: 6px;
+      min-height: 120px;
+      transition: opacity 0.2s, transform 0.2s;
+      opacity: 0;
+      transform: scale(0.95);
+      text-shadow: 0 0 40px rgba(255,255,255,0.15);
+    }
+
+    #word-display.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    #word-display.flash {
+      color: #a78bfa;
+      text-shadow: 0 0 60px rgba(167,139,250,0.5);
+    }
+
+    .history {
+      margin-top: 60px;
+      color: #333;
+      font-size: 13px;
+      letter-spacing: 1px;
+    }
+    .history span {
+      display: inline-block;
+      margin: 0 8px;
+      transition: color 0.5s;
+    }
+    .history span.recent { color: #666; }
+  </style>
+</head>
+<body>
+
+  <div class="status waiting" id="status">● Connecting...</div>
+  <div class="label">They are thinking of...</div>
+  <div id="word-display"></div>
+  <div class="history" id="history"></div>
+
+<script>
+  const DB_URL = "https://global-search-stats-default-rtdb.firebaseio.com/chosenWord.json";
+  const display = document.getElementById('word-display');
+  const statusEl = document.getElementById('status');
+  const historyEl = document.getElementById('history');
+
+  let wordHistory = [];
+  let lastWord = null;
+  let flashTimeout;
+
+  function showWord(word) {
+    if (word === lastWord) return;
+    lastWord = word;
+
+    clearTimeout(flashTimeout);
+    display.className = '';
+    display.textContent = word;
+
+    requestAnimationFrame(() => {
+      display.className = 'visible flash';
+      flashTimeout = setTimeout(() => {
+        display.classList.remove('flash');
+      }, 600);
+    });
+
+    wordHistory.push(word);
+    if (wordHistory.length > 6) wordHistory.shift();
+    renderHistory();
+  }
+
+  function renderHistory() {
+    historyEl.innerHTML = wordHistory
+      .slice(0, -1)
+      .map((w, i) => `<span class="${i === wordHistory.length - 2 ? 'recent' : ''}">${w}</span>`)
+      .join(' · ');
+  }
+
+  async function poll() {
+    try {
+      const r = await fetch(DB_URL);
+      if (r.ok) {
+        const word = await r.json();
+        if (word) {
+          statusEl.textContent = '● Live';
+          statusEl.className = 'status connected';
+          showWord(word);
+        }
+      }
+    } catch (e) {
+      statusEl.textContent = '● No connection';
+      statusEl.className = 'status waiting';
+    }
+  }
+
+  poll();
+  setInterval(poll, 500);
+</script>
+
+</body>
+</html>

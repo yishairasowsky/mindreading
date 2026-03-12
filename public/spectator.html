@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browse A–Z | OED | Oxford English Dictionary</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f4ef;
+    color: #222;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── Utility bar ── */
+  #util-bar {
+    background: #001733;
+    color: #ccc;
+    font-size: 12px;
+    padding: 5px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #util-bar a { color: #bbb; text-decoration: none; margin: 0 6px; }
+  #util-bar a:hover { color: #fff; text-decoration: underline; }
+  #util-bar .sep { color: #555; margin: 0 2px; }
+
+  /* ── Main nav ── */
+  #main-nav {
+    background: #002147;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  #oed-logo {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-family: Georgia, serif;
+    white-space: nowrap;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  #oed-logo span { color: #c8102e; }
+  #search-wrap {
+    flex: 1;
+    max-width: 540px;
+    display: flex;
+  }
+  #search-input {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 2px 0 0 2px;
+    outline: none;
+  }
+  #search-btn {
+    background: #c8102e;
+    color: #fff;
+    border: none;
+    padding: 0 18px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 0 2px 2px 0;
+    font-weight: 600;
+  }
+  #search-btn:hover { background: #a50d26; }
+
+  /* ── Tabs bar ── */
+  #tabs-bar {
+    background: #003060;
+    padding: 0 20px;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  .tab {
+    color: #b0bfcf;
+    padding: 10px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    text-decoration: none;
+    display: block;
+    transition: color 0.15s;
+  }
+  .tab:hover { color: #fff; }
+  .tab.active {
+    color: #fff;
+    border-bottom: 3px solid #c8102e;
+    background: rgba(255,255,255,0.07);
+  }
+
+  /* ── Breadcrumb ── */
+  #breadcrumb {
+    background: #e8e6df;
+    border-bottom: 1px solid #d0cec6;
+    padding: 6px 20px;
+    font-size: 12px;
+    color: #666;
+  }
+  #breadcrumb a { color: #002147; text-decoration: none; }
+  #breadcrumb a:hover { text-decoration: underline; }
+
+  /* ── Page layout ── */
+  #page-wrap {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 20px 20px 40px;
+    display: flex;
+    gap: 22px;
+    align-items: flex-start;
+  }
+
+  /* ── Main panel ── */
+  #main-panel {
+    flex: 1;
+    min-width: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 24px 26px 30px;
+  }
+
+  #panel-title {
+    font-family: Georgia, serif;
+    font-size: 26px;
+    color: #002147;
+    margin-bottom: 6px;
+    font-weight: 400;
+  }
+
+  #intro-box {
+    background: #f0eeea;
+    border: 1px solid #ddd;
+    border-left: 4px solid #002147;
+    padding: 12px 16px;
+    margin-bottom: 22px;
+    font-size: 13.5px;
+    color: #444;
+    line-height: 1.6;
+  }
+
+  /* ── Alphabet bar ── */
+  #alpha-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 22px;
+  }
+  .alpha-btn {
+    width: 34px;
+    height: 34px;
+    background: #002147;
+    color: #fff;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .alpha-btn:hover { background: #003d8a; }
+  .alpha-btn.active { background: #c8102e; }
+
+  /* ── Section header ── */
+  #section-header {
+    border-bottom: 2px solid #002147;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+  #section-letter {
+    font-family: Georgia, serif;
+    font-size: 36px;
+    color: #002147;
+    font-weight: 400;
+    line-height: 1;
+  }
+  #section-meta {
+    font-size: 13px;
+    color: #666;
+  }
+  #section-meta strong { color: #002147; }
+
+  /* ── Word grid ── */
+  #word-grid {
+    columns: 3;
+    column-gap: 24px;
+  }
+  .word-btn {
+    display: block;
+    break-inside: avoid;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #eee;
+    width: 100%;
+    text-align: left;
+    padding: 5px 2px;
+    font-size: 13.5px;
+    color: #1a518a;
+    font-weight: 400;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+  }
+  .word-btn:hover {
+    color: #1a518a;
+    text-decoration: underline;
+  }
+
+  /* ── Popup ── */
+  #def-popup {
+    position: fixed;
+    z-index: 9999;
+    pointer-events: none;
+    width: 308px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-top: 3px solid #002147;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+    padding: 14px 16px 16px;
+    display: none;
+    font-family: Arial, sans-serif;
+  }
+  #popup-word {
+    font-family: Georgia, serif;
+    font-size: 16px;
+    color: #002147;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  #popup-pos {
+    display: block;
+    font-size: 11px;
+    font-style: italic;
+    color: #888;
+    margin-bottom: 6px;
+    font-family: Georgia, serif;
+  }
+  #popup-def {
+    font-size: 13.5px;
+    color: #333;
+    line-height: 1.55;
+    margin-bottom: 6px;
+  }
+  #popup-example {
+    font-size: 12.5px;
+    color: #666;
+    font-style: italic;
+    border-left: 3px solid #ddd;
+    padding-left: 8px;
+    line-height: 1.5;
+  }
+  #popup-loading {
+    font-size: 13px;
+    color: #888;
+    font-style: italic;
+  }
+
+  /* ── Sidebar ── */
+  #sidebar {
+    width: 210px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .sidebar-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 14px 14px 16px;
+  }
+  .sidebar-card h3 {
+    font-family: Georgia, serif;
+    font-size: 14px;
+    color: #002147;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+    font-weight: 400;
+  }
+  .wotd-word {
+    font-family: Georgia, serif;
+    font-size: 18px;
+    color: #002147;
+    font-weight: 700;
+  }
+  .wotd-pos {
+    font-size: 11px;
+    color: #888;
+    font-style: italic;
+    margin-bottom: 5px;
+  }
+  .wotd-def {
+    font-size: 12px;
+    color: #444;
+    line-height: 1.5;
+  }
+  .sidebar-list {
+    list-style: none;
+  }
+  .sidebar-list li {
+    padding: 4px 0;
+    border-bottom: 1px solid #f0eeea;
+    font-size: 13px;
+  }
+  .sidebar-list li:last-child { border-bottom: none; }
+  .sidebar-list a {
+    color: #002147;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .sidebar-list a:hover { color: #c8102e; text-decoration: underline; }
+  .fact-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid #f0eeea;
+    font-size: 12px;
+  }
+  .fact-row:last-child { border-bottom: none; }
+  .fact-val { font-weight: 700; color: #002147; }
+
+  /* ── Footer ── */
+  #footer {
+    background: #002147;
+    color: #aab4c0;
+    padding: 14px 20px;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  #footer a { color: #8ea8bf; text-decoration: none; margin: 0 8px; }
+  #footer a:hover { color: #fff; text-decoration: underline; }
+
+  /* ── Pagination ── */
+  #pagination {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 24px;
+    font-size: 13px;
+    color: #444;
+  }
+  .pg-btn {
+    background: none;
+    border: 1px solid #bbb;
+    border-radius: 2px;
+    padding: 4px 10px;
+    font-size: 13px;
+    color: #002147;
+    cursor: pointer;
+  }
+  .pg-btn:hover:not(:disabled) { background: #f0eeea; }
+  .pg-btn:disabled { color: #bbb; border-color: #ddd; cursor: default; }
+  .pg-btn.active { background: #002147; color: #fff; border-color: #002147; }
+  #pg-info { margin: 0 6px; color: #555; }
+
+  @media (max-width: 780px) {
+    #word-grid { columns: 2; }
+    #sidebar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Utility bar -->
+<div id="util-bar">
+  <div>
+    <a href="#">Sign in</a><span class="sep">|</span>
+    <a href="#">Subscribe</a><span class="sep">|</span>
+    <a href="#">Institutional access</a>
+  </div>
+  <div>
+    <a href="#">Help</a><span class="sep">|</span>
+    <a href="#">Oxford University Press</a>
+  </div>
+</div>
+
+<!-- Main nav -->
+<div id="main-nav">
+  <a id="oed-logo" href="#">Oxford English Dictionary</a>
+  <div id="search-wrap">
+    <input id="search-input" type="text" placeholder="Search the OED&hellip;" autocomplete="off">
+    <button id="search-btn">Search</button>
+  </div>
+</div>
+
+<!-- Tabs bar -->
+<div id="tabs-bar">
+  <a class="tab active" href="#">Dictionary</a>
+  <a class="tab" href="#">Thesaurus</a>
+  <a class="tab" href="#">Grammar</a>
+  <a class="tab" href="#">New words</a>
+  <a class="tab" href="#">Word of the Day</a>
+  <a class="tab" href="#">Browse A&ndash;Z</a>
+</div>
+
+<!-- Breadcrumb -->
+<div id="breadcrumb">
+  <a href="#">Home</a> &rsaquo; <a href="#">Dictionary</a> &rsaquo; Browse A&ndash;Z
+</div>
+
+<!-- Page wrap -->
+<div id="page-wrap">
+
+  <!-- Main panel -->
+  <div id="main-panel">
+    <h1 id="panel-title">Browse the Dictionary A&ndash;Z</h1>
+    <div id="intro-box">
+      Browse the OED A&ndash;Z. Select any letter, then hover a word to see its definition and etymology.
+    </div>
+
+    <div id="alpha-bar"></div>
+
+    <div id="section-header">
+      <div id="section-letter">S</div>
+    </div>
+
+    <div id="word-grid"></div>
+    <div id="pagination"></div>
+  </div>
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div class="sidebar-card">
+      <h3>Word of the Day</h3>
+      <div class="wotd-word">ephemeral</div>
+      <div class="wotd-pos">adjective</div>
+      <div class="wotd-def">Lasting for a very short time; transitory. Originally applied to plants completing their life cycle within a single day.</div>
+    </div>
+
+    <div class="sidebar-card">
+      <h3>Editors&rsquo; Picks</h3>
+      <ul class="sidebar-list">
+        <li><a href="#">melancholy</a></li>
+        <li><a href="#">sanguine</a></li>
+        <li><a href="#">perspicacious</a></li>
+        <li><a href="#">laconic</a></li>
+        <li><a href="#">equanimity</a></li>
+        <li><a href="#">tenacious</a></li>
+      </ul>
+    </div>
+
+    <div class="sidebar-card">
+      <h3>Dictionary Facts</h3>
+      <div class="fact-row"><span>Total entries</span><span class="fact-val">617,400</span></div>
+      <div class="fact-row"><span>Quotations</span><span class="fact-val">3.5 million</span></div>
+      <div class="fact-row"><span>Languages traced</span><span class="fact-val">40+</span></div>
+      <div class="fact-row"><span>Last updated</span><span class="fact-val">Dec 2024</span></div>
+    </div>
+
+    <div class="sidebar-card">
+      <h3>Recently Viewed</h3>
+      <ul class="sidebar-list">
+        <li><a href="#">resilient</a></li>
+        <li><a href="#">wistful</a></li>
+        <li><a href="#">candid</a></li>
+        <li><a href="#">lucid</a></li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<!-- Popup -->
+<div id="def-popup">
+  <div id="popup-word"></div>
+  <div id="popup-pos"></div>
+  <div id="popup-def"></div>
+  <div id="popup-example"></div>
+  <div id="popup-loading"></div>
+</div>
+
+<!-- Footer -->
+<div id="footer">
+  <span>&copy; Oxford University Press 2024</span>
+  <div>
+    <a href="#">Privacy policy</a>
+    <a href="#">Cookie policy</a>
+    <a href="#">Legal notice</a>
+    <a href="#">Accessibility</a>
+  </div>
+</div>
+
+<script src="words.js"></script>
+<script>
+const DB_URL = 'https://global-search-stats-default-rtdb.firebaseio.com/chosenWord.json';
+
+// De-duplicate and sort each letter's list
+Object.keys(WORDS).forEach(letter => {
+  WORDS[letter] = [...new Set(WORDS[letter])].sort();
+});
+
+const popup      = document.getElementById('def-popup');
+const popWord    = document.getElementById('popup-word');
+const popPos     = document.getElementById('popup-pos');
+const popDef     = document.getElementById('popup-def');
+const popEx      = document.getElementById('popup-example');
+const popLoading = document.getElementById('popup-loading');
+const wordGrid   = document.getElementById('word-grid');
+const alphaBar   = document.getElementById('alpha-bar');
+
+let currentLetter = '';
+let lastSentWord  = '';
+const defCache    = {};
+
+// Search
+const searchInput = document.getElementById('search-input');
+const searchBtn   = document.getElementById('search-btn');
+
+function doSearch() {
+  const query = searchInput.value.trim().toLowerCase();
+  if (!query) return;
+  const letter = query[0].toUpperCase();
+  const list   = WORDS[letter] || [];
+  const match  = list.find(w => w.toLowerCase() === query);
+  if (match) {
+    showLetter(letter);
+    // Scroll to and briefly highlight the matched word
+    setTimeout(() => {
+      const btns = wordGrid.querySelectorAll('.word-btn');
+      btns.forEach(btn => {
+        if (btn.textContent.toLowerCase() === query) {
+          btn.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          btn.style.background = '#e8f0fb';
+          setTimeout(() => { btn.style.background = ''; }, 1800);
+        }
+      });
+    }, 50);
+  } else {
+    const sectionLetter = document.getElementById('section-letter');
+    const wordCount     = document.getElementById('word-count');
+    sectionLetter.textContent = '—';
+    wordCount.textContent = '0';
+    wordGrid.innerHTML = `<p style="grid-column:1/-1;color:#666;font-size:13.5px;padding:10px 0;">
+      No dictionary entries found for <strong>${query}</strong>. Please check your spelling or browse by letter above.
+    </p>`;
+    hidePopup();
+  }
+}
+
+searchBtn.addEventListener('click', doSearch);
+searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+// Build alphabet bar
+'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(letter => {
+  const btn = document.createElement('button');
+  btn.className = 'alpha-btn';
+  btn.textContent = letter;
+  btn.addEventListener('click', () => showLetter(letter));
+  alphaBar.appendChild(btn);
+});
+
+function placePopup(x, y) {
+  const ph = popup.offsetHeight || 210;
+  let left = x + 14, top = y + 14;
+  if (left + 308 > window.innerWidth - 8)  left = x - 322;
+  if (top  + ph  > window.innerHeight - 8) top  = y - ph - 6;
+  popup.style.left = left + 'px';
+  popup.style.top  = top  + 'px';
+}
+
+function hidePopup() {
+  popup.style.display = 'none';
+  popWord.textContent    = '';
+  popPos.textContent     = '';
+  popDef.textContent     = '';
+  popEx.textContent      = '';
+  popLoading.textContent = '';
+}
+
+async function fetchDefinition(word) {
+  if (defCache[word] !== undefined) return defCache[word];
+  try {
+    const url  = `https://api.datamuse.com/words?sp=${encodeURIComponent(word)}&md=dp&max=1`;
+    const res  = await fetch(url);
+    const data = await res.json();
+    if (!data || !data[0] || !data[0].defs || !data[0].defs[0]) {
+      defCache[word] = null;
+      return null;
+    }
+    const raw  = data[0].defs[0];
+    const tab  = raw.indexOf('\t');
+    const pos  = tab >= 0 ? raw.slice(0, tab) : '';
+    const text = tab >= 0 ? raw.slice(tab + 1) : raw;
+    defCache[word] = { pos, text };
+    return defCache[word];
+  } catch (e) {
+    defCache[word] = null;
+    return null;
+  }
+}
+
+const PAGE_SIZE = 15;
+
+let currentPage = 1;
+
+function showLetter(letter, page) {
+  currentLetter = letter;
+  currentPage   = page || 1;
+
+  document.querySelectorAll('.alpha-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === letter);
+  });
+
+  document.getElementById('section-letter').textContent = letter;
+
+  const allWords  = WORDS[letter] || [];
+  const totalPages = Math.ceil(allWords.length / PAGE_SIZE);
+  const pageWords  = allWords.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  wordGrid.innerHTML = '';
+  hidePopup();
+
+  pageWords.forEach(word => {
+    const btn = document.createElement('button');
+    btn.className   = 'word-btn';
+    btn.textContent = word;
+
+    btn.addEventListener('mouseenter', (e) => {
+      if (word !== lastSentWord) {
+        lastSentWord = word;
+        fetch(DB_URL, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(word)
+        }).catch(() => {});
+      }
+
+      popup.style.display = 'block';
+      placePopup(e.clientX, e.clientY);
+      popWord.textContent    = word;
+      popPos.textContent     = '';
+      popDef.textContent     = '';
+      popEx.textContent      = '';
+      popLoading.textContent = 'Loading\u2026';
+
+      fetchDefinition(word).then(result => {
+        if (popWord.textContent !== word) return;
+        if (!result) { hidePopup(); return; }
+        popLoading.textContent = '';
+        popPos.textContent     = result.pos;
+        popDef.textContent     = result.text;
+        popEx.textContent      = '';
+      });
+    });
+
+    btn.addEventListener('mousemove', (e) => {
+      if (popup.style.display === 'block') placePopup(e.clientX, e.clientY);
+    });
+
+    btn.addEventListener('mouseleave', hidePopup);
+
+    wordGrid.appendChild(btn);
+  });
+
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages) {
+  const pg = document.getElementById('pagination');
+  pg.innerHTML = '';
+
+  const prev = document.createElement('button');
+  prev.className = 'pg-btn';
+  prev.textContent = '‹ Previous';
+  prev.disabled = currentPage === 1;
+  prev.addEventListener('click', () => showLetter(currentLetter, currentPage - 1));
+  pg.appendChild(prev);
+
+  // Show a window of nearby page numbers
+  const window_size = 5;
+  let start = Math.max(1, currentPage - 2);
+  let end   = Math.min(totalPages, start + window_size - 1);
+  start     = Math.max(1, end - window_size + 1);
+
+  if (start > 1) {
+    pg.appendChild(pgNumBtn(1, totalPages));
+    if (start > 2) pg.appendChild(pgEllipsis());
+  }
+  for (let i = start; i <= end; i++) pg.appendChild(pgNumBtn(i, totalPages));
+  if (end < totalPages) {
+    if (end < totalPages - 1) pg.appendChild(pgEllipsis());
+    pg.appendChild(pgNumBtn(totalPages, totalPages));
+  }
+
+  const next = document.createElement('button');
+  next.className = 'pg-btn';
+  next.textContent = 'Next ›';
+  next.disabled = currentPage === totalPages;
+  next.addEventListener('click', () => showLetter(currentLetter, currentPage + 1));
+  pg.appendChild(next);
+}
+
+function pgNumBtn(n, totalPages) {
+  const b = document.createElement('button');
+  b.className = 'pg-btn' + (n === currentPage ? ' active' : '');
+  b.textContent = n;
+  b.addEventListener('click', () => showLetter(currentLetter, n));
+  return b;
+}
+
+function pgEllipsis() {
+  const s = document.createElement('span');
+  s.textContent = '…';
+  s.style.padding = '0 4px';
+  s.style.color = '#888';
+  return s;
+}
+
+showLetter('S');
+</script>
+</body>
+</html>
