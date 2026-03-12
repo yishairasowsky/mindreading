@@ -9,11 +9,19 @@ const io = new Server(server);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'spectator.html'));
+});
+
 app.get('/spectator', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'spectator.html'));
 });
 
 app.get('/performer', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'performer.html'));
+});
+
+app.get('/backstage', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'performer.html'));
 });
 
