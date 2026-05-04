@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Mind Reader</title>
+  <title>Mind Reader — Backstage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -18,6 +19,53 @@
       text-align: center;
     }
 
+    /* ── Channel switcher ── */
+    #channel-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #111;
+      border-bottom: 1px solid #222;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 16px;
+      z-index: 100;
+    }
+    .ch-btn {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      color: #666;
+      padding: 6px 16px;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 3px;
+      font-family: Arial, sans-serif;
+      transition: all 0.15s;
+    }
+    .ch-btn:hover { border-color: #555; color: #aaa; }
+    .ch-btn.active {
+      background: #1a2a1a;
+      border-color: #2ecc71;
+      color: #2ecc71;
+    }
+    .ch-btn.active.atlas {
+      background: #1a2233;
+      border-color: #0eb8e8;
+      color: #0eb8e8;
+    }
+
+    /* ── Main display ── */
+    #main-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 60px;
+    }
+
     .status {
       font-size: 13px;
       color: #555;
@@ -28,6 +76,14 @@
     .status.connected { color: #2ecc71; }
     .status.waiting { color: #888; }
 
+    #channel-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
     .label {
       font-size: 14px;
       letter-spacing: 4px;
@@ -37,15 +93,17 @@
     }
 
     #word-display {
-      font-size: 100px;
+      font-size: 80px;
       font-weight: bold;
       color: #fff;
-      letter-spacing: 6px;
-      min-height: 120px;
+      letter-spacing: 4px;
+      min-height: 100px;
       transition: opacity 0.2s, transform 0.2s;
       opacity: 0;
       transform: scale(0.95);
       text-shadow: 0 0 40px rgba(255,255,255,0.15);
+      max-width: 90vw;
+      word-break: break-word;
     }
 
     #word-display.visible {
@@ -58,8 +116,13 @@
       text-shadow: 0 0 60px rgba(167,139,250,0.5);
     }
 
+    #word-display.flash.atlas-mode {
+      color: #7ecbdf;
+      text-shadow: 0 0 60px rgba(126,203,223,0.5);
+    }
+
     .history {
-      margin-top: 60px;
+      margin-top: 50px;
       color: #333;
       font-size: 13px;
       letter-spacing: 1px;
@@ -69,36 +132,86 @@
       margin: 0 8px;
       transition: color 0.5s;
     }
-    .history span.recent { color: #666; }
+    .history span.recent { color: #555; }
   </style>
 </head>
 <body>
 
-  <div class="status waiting" id="status">● Connecting...</div>
-  <div class="label">They are thinking of...</div>
-  <div id="word-display"></div>
-  <div class="history" id="history"></div>
+  <!-- Channel switcher -->
+  <div id="channel-bar">
+    <button class="ch-btn active" data-channel="dictionary" onclick="switchChannel('dictionary')">📖 Dictionary</button>
+    <button class="ch-btn atlas"  data-channel="atlas"      onclick="switchChannel('atlas')">🌍 Atlas</button>
+  </div>
+
+  <div id="main-wrap">
+    <div class="status waiting" id="status">● Connecting...</div>
+    <div id="channel-label">Dictionary</div>
+    <div class="label">They are thinking of...</div>
+    <div id="word-display"></div>
+    <div class="history" id="history"></div>
+  </div>
 
 <script>
-  const DB_URL = "https://global-search-stats-default-rtdb.firebaseio.com/chosenWord.json";
-  const display = document.getElementById('word-display');
-  const statusEl = document.getElementById('status');
-  const historyEl = document.getElementById('history');
+  const CHANNELS = {
+    dictionary: {
+      url:   'https://global-search-stats-default-rtdb.firebaseio.com/chosenWord.json',
+      label: 'Dictionary',
+    },
+    atlas: {
+      url:   'https://global-search-stats-default-rtdb.firebaseio.com/chosenPlace.json',
+      label: 'World Atlas',
+    },
+  };
 
-  let wordHistory = [];
-  let lastWord = null;
+  const display     = document.getElementById('word-display');
+  const statusEl    = document.getElementById('status');
+  const historyEl   = document.getElementById('history');
+  const channelLbl  = document.getElementById('channel-label');
+
+  let wordHistory  = [];
+  let lastWord     = null;
   let flashTimeout;
+  let pollInterval;
+  let currentChannel = 'dictionary';
+
+  function switchChannel(name) {
+    if (name === currentChannel) return;
+    currentChannel = name;
+
+    document.querySelectorAll('.ch-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.channel === name);
+    });
+
+    channelLbl.textContent = CHANNELS[name].label;
+    if (name === 'atlas') {
+      display.classList.add('atlas-mode');
+    } else {
+      display.classList.remove('atlas-mode');
+    }
+
+    // reset display
+    lastWord = null;
+    wordHistory = [];
+    historyEl.innerHTML = '';
+    display.className = '';
+    display.textContent = '';
+
+    clearInterval(pollInterval);
+    poll();
+    pollInterval = setInterval(poll, 500);
+  }
 
   function showWord(word) {
     if (word === lastWord) return;
     lastWord = word;
 
     clearTimeout(flashTimeout);
-    display.className = '';
+    const isAtlas = currentChannel === 'atlas';
+    display.className = isAtlas ? 'atlas-mode' : '';
     display.textContent = word;
 
     requestAnimationFrame(() => {
-      display.className = 'visible flash';
+      display.className = 'visible flash' + (isAtlas ? ' atlas-mode' : '');
       flashTimeout = setTimeout(() => {
         display.classList.remove('flash');
       }, 600);
@@ -117,8 +230,9 @@
   }
 
   async function poll() {
+    const ch = CHANNELS[currentChannel];
     try {
-      const r = await fetch(DB_URL);
+      const r = await fetch(ch.url);
       if (r.ok) {
         const word = await r.json();
         if (word) {
@@ -134,7 +248,7 @@
   }
 
   poll();
-  setInterval(poll, 500);
+  pollInterval = setInterval(poll, 500);
 </script>
 
 </body>

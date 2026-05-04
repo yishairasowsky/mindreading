@@ -7,7 +7,33 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// --- Number Force (pick) config ---
+let pickConfig = { category: 'cities', forceItem: 'Paris' };
+
+app.get('/pick', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'pick.html'));
+});
+
+app.get('/pick/backstage', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'pick-backstage.html'));
+});
+
+app.get('/api/pick/config', (req, res) => {
+  res.json(pickConfig);
+});
+
+app.post('/api/pick/config', (req, res) => {
+  const { category, forceItem } = req.body;
+  if (category && forceItem) {
+    pickConfig = { category, forceItem };
+    res.json({ ok: true });
+  } else {
+    res.status(400).json({ error: 'Missing category or forceItem' });
+  }
+});
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'spectator.html'));
@@ -23,6 +49,20 @@ app.get('/performer', (req, res) => {
 
 app.get('/backstage', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'performer.html'));
+});
+
+app.get('/atlas', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'atlas.html'));
+});
+
+// Classic two-panel version (click to select country, then browse cities)
+app.get('/atlas-classic', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'atlas-classic.html'));
+});
+
+// Interactive map version (hover city dots on a real world map)
+app.get('/atlas-map', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'atlas-map.html'));
 });
 
 io.on('connection', (socket) => {

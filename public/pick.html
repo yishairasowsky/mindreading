@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>The 100 List</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            color: #333;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px 16px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            touch-action: manipulation;
+        }
+        header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        header p {
+            font-size: 13px;
+            opacity: 0.6;
+            margin-top: 4px;
+        }
+        .list-container {
+            padding: 0;
+        }
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: 13px 16px;
+            border-bottom: 1px solid #eee;
+            background: white;
+        }
+        .list-item:nth-child(even) {
+            background: #f8f9fa;
+        }
+        .item-number {
+            font-size: 13px;
+            font-weight: 700;
+            color: #2c3e50;
+            width: 32px;
+            flex-shrink: 0;
+            opacity: 0.5;
+        }
+        .item-name {
+            font-size: 16px;
+            font-weight: 400;
+        }
+        .highlight {
+            background: #fff9c4 !important;
+        }
+
+        /* Secret overlay - very subtle */
+        #secret-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.08);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        #secret-overlay.active {
+            display: flex;
+        }
+        .secret-pad {
+            background: rgba(30,30,30,0.85);
+            border-radius: 20px;
+            padding: 20px;
+            width: 240px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .secret-display {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 16px;
+            height: 44px;
+            line-height: 44px;
+            letter-spacing: 4px;
+        }
+        .secret-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .secret-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: rgba(255,255,255,0.9);
+            font-size: 22px;
+            padding: 16px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            transition: background 0.1s;
+        }
+        .secret-btn:active {
+            background: rgba(255,255,255,0.3);
+        }
+        .secret-btn.confirm {
+            background: rgba(76, 175, 80, 0.5);
+        }
+        .secret-btn.confirm:active {
+            background: rgba(76, 175, 80, 0.7);
+        }
+        .secret-btn.clear {
+            background: rgba(244, 67, 54, 0.35);
+        }
+        .secret-btn.clear:active {
+            background: rgba(244, 67, 54, 0.55);
+        }
+    </style>
+</head>
+<body>
+    <header id="header">
+        <h1 id="title">The 100 List</h1>
+        <p>Browse the complete list below</p>
+    </header>
+
+    <div class="list-container" id="list"></div>
+
+    <div id="secret-overlay">
+        <div class="secret-pad">
+            <div class="secret-display" id="secret-display">&ndash;</div>
+            <div class="secret-grid" id="secret-grid">
+                <button class="secret-btn" data-d="1">1</button>
+                <button class="secret-btn" data-d="2">2</button>
+                <button class="secret-btn" data-d="3">3</button>
+                <button class="secret-btn" data-d="4">4</button>
+                <button class="secret-btn" data-d="5">5</button>
+                <button class="secret-btn" data-d="6">6</button>
+                <button class="secret-btn" data-d="7">7</button>
+                <button class="secret-btn" data-d="8">8</button>
+                <button class="secret-btn" data-d="9">9</button>
+                <button class="secret-btn clear" data-a="clear">&times;</button>
+                <button class="secret-btn" data-d="0">0</button>
+                <button class="secret-btn confirm" data-a="go">&check;</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const DATA = {
+        cities: {
+            title: "100 World Cities",
+            items: [
+                "Paris","London","Tokyo","New York","Rome","Sydney","Cairo","Dubai",
+                "Bangkok","Barcelona","Berlin","Moscow","Mumbai","Beijing","Istanbul",
+                "Rio de Janeiro","Amsterdam","Singapore","Hong Kong","San Francisco",
+                "Toronto","Buenos Aires","Seoul","Mexico City","Dublin","Vienna",
+                "Prague","Lisbon","Athens","Copenhagen","Stockholm","Oslo","Helsinki",
+                "Warsaw","Budapest","Zurich","Geneva","Brussels","Edinburgh","Cape Town",
+                "Nairobi","Lagos","Marrakech","Jerusalem","Taipei","Manila","Jakarta",
+                "Kuala Lumpur","Hanoi","Havana","Lima","Bogota","Santiago","Reykjavik",
+                "Casablanca","Johannesburg","Vancouver","Montreal","Las Vegas","Miami",
+                "Chicago","Boston","Seattle","Los Angeles","Washington DC","New Orleans",
+                "Nashville","Denver","Portland","Honolulu","Cancun","Panama City",
+                "Cartagena","Quito","Montevideo","Sao Paulo","Florence","Venice",
+                "Milan","Nice","Lyon","Munich","Hamburg","Cologne","Krakow","Dubrovnik",
+                "Santorini","Kyoto","Shanghai","Ho Chi Minh City","Perth","Melbourne",
+                "Auckland","Doha","Muscat","Petra","Cusco","Zanzibar","Bruges","Tallinn"
+            ]
+        },
+        celebrities: {
+            title: "100 Famous People",
+            items: [
+                "Albert Einstein","Leonardo da Vinci","William Shakespeare","Cleopatra",
+                "Napoleon Bonaparte","Mahatma Gandhi","Martin Luther King Jr","Nelson Mandela",
+                "Marie Curie","Charles Darwin","Isaac Newton","Galileo Galilei",
+                "Wolfgang Mozart","Ludwig van Beethoven","Frida Kahlo","Pablo Picasso",
+                "Marilyn Monroe","Elvis Presley","Michael Jackson","The Beatles",
+                "Muhammad Ali","Serena Williams","Usain Bolt","Michael Jordan",
+                "Oprah Winfrey","Walt Disney","Steve Jobs","Elon Musk",
+                "Queen Elizabeth II","Princess Diana","Abraham Lincoln","George Washington",
+                "Julius Caesar","Alexander the Great","Genghis Khan","Marco Polo",
+                "Christopher Columbus","Amelia Earhart","Neil Armstrong","Buzz Aldrin",
+                "Thomas Edison","Nikola Tesla","Alexander Graham Bell","Henry Ford",
+                "Wright Brothers","Ada Lovelace","Alan Turing","Grace Hopper",
+                "Sigmund Freud","Florence Nightingale","Mother Teresa","Dalai Lama",
+                "Pope Francis","Confucius","Socrates","Aristotle",
+                "Plato","Homer","Mark Twain","Ernest Hemingway",
+                "Jane Austen","Charles Dickens","Leo Tolstoy","Fyodor Dostoevsky",
+                "Vincent van Gogh","Claude Monet","Michelangelo","Rembrandt",
+                "Charlie Chaplin","Alfred Hitchcock","Steven Spielberg","Stanley Kubrick",
+                "Audrey Hepburn","Coco Chanel","David Bowie","Bob Marley",
+                "Freddie Mercury","John Lennon","Prince","Whitney Houston",
+                "Frank Sinatra","Louis Armstrong","Miles Davis","Jimi Hendrix",
+                "Bruce Lee","Jackie Chan","Pele","Diego Maradona",
+                "Tiger Woods","Roger Federer","Simone Biles","Lionel Messi",
+                "Cristiano Ronaldo","LeBron James","Tom Hanks","Meryl Streep",
+                "Morgan Freeman","Denzel Washington","Beyonce","Taylor Swift"
+            ]
+        },
+        foods: {
+            title: "100 Popular Foods",
+            items: [
+                "Pizza","Sushi","Tacos","Pasta","Burger","Croissant","Dim Sum","Curry",
+                "Pad Thai","Ramen","Pho","Biryani","Paella","Risotto","Lasagna","Goulash",
+                "Fish and Chips","Kebab","Falafel","Hummus","Guacamole","Ceviche",
+                "Empanada","Churros","Baklava","Tiramisu","Cheesecake","Chocolate Cake",
+                "Ice Cream","Crepes","Waffles","Pancakes","French Toast","Eggs Benedict",
+                "Caesar Salad","Greek Salad","Tom Yum Soup","Miso Soup","Clam Chowder",
+                "Lobster","Oysters","Shrimp Cocktail","Salmon","Tuna Steak","Steak",
+                "Fried Chicken","BBQ Ribs","Pulled Pork","Beef Stew","Shepherd's Pie",
+                "Bangers and Mash","Peking Duck","Kung Pao Chicken","Sweet and Sour Pork",
+                "Spring Rolls","Dumplings","Naan Bread","Samosa","Tandoori Chicken",
+                "Butter Chicken","Vindaloo","Masala Dosa","Nasi Goreng","Satay",
+                "Bibimbap","Kimchi","Gyoza","Tempura","Mochi","Gelato","Macaron",
+                "Pretzel","Bratwurst","Schnitzel","Pierogi","Borscht","Moussaka",
+                "Souvlaki","Bruschetta","Prosciutto","Caprese Salad","Fondue",
+                "Raclette","Poutine","Jambalaya","Gumbo","Cornbread","Chili Con Carne",
+                "Nachos","Quesadilla","Burrito","Enchilada","Creme Brulee",
+                "Profiteroles","Apple Pie","Brownie","Banana Split","Pavlova",
+                "Sticky Toffee Pudding","Shakshuka"
+            ]
+        },
+        animals: {
+            title: "100 Animals",
+            items: [
+                "Lion","Elephant","Giraffe","Penguin","Dolphin","Eagle","Tiger","Bear",
+                "Wolf","Fox","Owl","Hawk","Falcon","Cheetah","Leopard","Jaguar",
+                "Gorilla","Chimpanzee","Orangutan","Panda","Koala","Kangaroo",
+                "Platypus","Crocodile","Alligator","Cobra","Python","Chameleon",
+                "Iguana","Tortoise","Sea Turtle","Shark","Whale","Octopus","Jellyfish",
+                "Seahorse","Starfish","Crab","Lobster","Flamingo","Peacock","Parrot",
+                "Toucan","Hummingbird","Swan","Pelican","Albatross","Rhinoceros",
+                "Hippopotamus","Zebra","Gazelle","Antelope","Buffalo","Moose","Elk",
+                "Deer","Rabbit","Hedgehog","Squirrel","Beaver","Otter","Seal",
+                "Walrus","Polar Bear","Arctic Fox","Reindeer","Wolverine","Badger",
+                "Raccoon","Skunk","Armadillo","Sloth","Anteater","Capybara","Llama",
+                "Alpaca","Camel","Horse","Donkey","Pig","Cow","Sheep","Goat",
+                "Rooster","Duck","Goose","Turkey","Salmon","Trout","Swordfish",
+                "Manta Ray","Clownfish","Pufferfish","Axolotl","Frog","Salamander",
+                "Dragonfly","Butterfly","Bee","Ant"
+            ]
+        },
+        countries: {
+            title: "100 Countries",
+            items: [
+                "France","Japan","Italy","Brazil","Australia","Egypt","India","Mexico",
+                "Thailand","Spain","Germany","Canada","Argentina","South Korea","Turkey",
+                "Greece","Portugal","Netherlands","Sweden","Norway","Denmark","Finland",
+                "Switzerland","Austria","Belgium","Ireland","Scotland","Poland","Czech Republic",
+                "Hungary","Croatia","Romania","Russia","Ukraine","Iceland","Morocco",
+                "South Africa","Kenya","Nigeria","Tanzania","Ethiopia","Ghana","Senegal",
+                "Colombia","Peru","Chile","Ecuador","Cuba","Jamaica","Costa Rica",
+                "Panama","Venezuela","Uruguay","Bolivia","China","Vietnam","Indonesia",
+                "Malaysia","Philippines","Singapore","Taiwan","Nepal","Sri Lanka",
+                "Cambodia","Myanmar","Laos","Mongolia","Pakistan","Bangladesh","Iran",
+                "Iraq","Israel","Jordan","Lebanon","Saudi Arabia","Qatar","Oman",
+                "New Zealand","Fiji","Samoa","Papua New Guinea","United States",
+                "United Kingdom","Luxembourg","Malta","Cyprus","Georgia","Armenia",
+                "Azerbaijan","Uzbekistan","Kazakhstan","Bhutan","Maldives","Madagascar",
+                "Mauritius","Seychelles","Belize","Guatemala","Honduras","Trinidad"
+            ]
+        }
+    };
+
+    // Seeded PRNG (mulberry32)
+    function mulberry32(seed) {
+        return function() {
+            seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+            let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+            t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+            return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        };
+    }
+
+    function hashStr(s) {
+        let h = 0;
+        for (let i = 0; i < s.length; i++) {
+            h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+        }
+        return Math.abs(h);
+    }
+
+    function seededShuffle(arr, seed) {
+        const a = arr.slice();
+        const rng = mulberry32(seed);
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(rng() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    let currentItems = [];
+    let forceItem = null;
+    let category = 'cities';
+
+    async function init() {
+        try {
+            const res = await fetch('/api/pick/config');
+            const config = await res.json();
+            category = config.category || 'cities';
+            forceItem = config.forceItem || DATA[category].items[0];
+        } catch(e) {
+            category = 'cities';
+            forceItem = 'Paris';
+        }
+
+        const cat = DATA[category];
+        document.getElementById('title').textContent = cat.title;
+        document.title = cat.title;
+
+        // Build shuffled list with force item in a neutral position
+        const others = cat.items.filter(item => item !== forceItem);
+        const shuffled = seededShuffle(others, hashStr(category + 'salt82'));
+        // Put force item somewhere in the middle initially
+        const midPos = Math.floor(shuffled.length / 2);
+        shuffled.splice(midPos, 0, forceItem);
+        currentItems = shuffled;
+
+        renderList();
+    }
+
+    function renderList(highlightIndex) {
+        const container = document.getElementById('list');
+        container.innerHTML = '';
+        currentItems.forEach((item, i) => {
+            const div = document.createElement('div');
+            div.className = 'list-item' + (i === highlightIndex ? ' highlight' : '');
+            div.id = 'item-' + i;
+            div.innerHTML = `<span class="item-number">${i + 1}.</span><span class="item-name">${item}</span>`;
+            container.appendChild(div);
+        });
+    }
+
+    function placeForceAt(n) {
+        // n is 1-indexed (1..100)
+        const idx = n - 1;
+        // Remove force item from current position
+        const curIdx = currentItems.indexOf(forceItem);
+        if (curIdx === -1) return;
+        currentItems.splice(curIdx, 1);
+        // Insert at target position
+        currentItems.splice(idx, 0, forceItem);
+        renderList();
+        // Scroll to show the target item, centered on screen
+        setTimeout(() => {
+            const el = document.getElementById('item-' + idx);
+            if (el) {
+                el.scrollIntoView({ behavior: 'auto', block: 'center' });
+            }
+        }, 50);
+    }
+
+    // ---- Secret pad logic ----
+    const overlay = document.getElementById('secret-overlay');
+    const display = document.getElementById('secret-display');
+    let secretValue = '';
+    let tapCount = 0;
+    let lastTapTime = 0;
+
+    // Activate: triple-tap the header
+    document.getElementById('header').addEventListener('click', (e) => {
+        const now = Date.now();
+        if (now - lastTapTime < 400) {
+            tapCount++;
+        } else {
+            tapCount = 1;
+        }
+        lastTapTime = now;
+
+        if (tapCount >= 3) {
+            tapCount = 0;
+            openPad();
+        }
+    });
+
+    function openPad() {
+        secretValue = '';
+        display.textContent = '\u2013';
+        overlay.classList.add('active');
+    }
+
+    function closePad() {
+        overlay.classList.remove('active');
+        secretValue = '';
+    }
+
+    // Handle pad button taps
+    document.getElementById('secret-grid').addEventListener('click', (e) => {
+        const btn = e.target.closest('.secret-btn');
+        if (!btn) return;
+        e.stopPropagation();
+
+        if (btn.dataset.d !== undefined) {
+            // Digit
+            if (secretValue.length < 3) {
+                secretValue += btn.dataset.d;
+                display.textContent = secretValue;
+            }
+        } else if (btn.dataset.a === 'clear') {
+            secretValue = '';
+            display.textContent = '\u2013';
+        } else if (btn.dataset.a === 'go') {
+            const num = parseInt(secretValue, 10);
+            if (num >= 1 && num <= 100) {
+                placeForceAt(num);
+                closePad();
+            } else {
+                display.textContent = '??';
+                secretValue = '';
+            }
+        }
+    });
+
+    // Close pad if tapping the overlay background (not the pad itself)
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            closePad();
+        }
+    });
+
+    init();
+    </script>
+</body>
+</html>

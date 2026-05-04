@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pick - Backstage</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+        .card {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 480px;
+            margin: 0 auto 20px;
+        }
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+        select, input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #0f3460;
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 20px;
+            -webkit-appearance: none;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn:active { opacity: 0.8; }
+        .btn-primary {
+            background: #e94560;
+            color: white;
+        }
+        .status {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #4ecdc4;
+            min-height: 20px;
+        }
+        .current-config {
+            background: #0f3460;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .current-config strong {
+            color: #e94560;
+        }
+        .instructions {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 480px;
+            margin: 0 auto 20px;
+        }
+        .instructions h2 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #e94560;
+        }
+        .instructions ol {
+            padding-left: 20px;
+            line-height: 1.8;
+            font-size: 14px;
+            color: #ccc;
+        }
+        .instructions code {
+            background: #0f3460;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .force-item-row {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        .force-item-row select {
+            flex: 1;
+        }
+        #force-search {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Number Force</h1>
+    <p class="subtitle">Backstage Configuration</p>
+
+    <div class="card">
+        <label>Category</label>
+        <select id="category">
+            <option value="cities">World Cities</option>
+            <option value="celebrities">Famous People</option>
+            <option value="foods">Popular Foods</option>
+            <option value="animals">Animals</option>
+            <option value="countries">Countries</option>
+        </select>
+
+        <label>Force Item</label>
+        <input type="text" id="force-search" placeholder="Type to filter...">
+        <select id="force-item" size="6"></select>
+
+        <button class="btn btn-primary" id="save-btn">Save Configuration</button>
+        <div class="status" id="status"></div>
+
+        <div class="current-config" id="current-config">
+            Loading current config...
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h2>How to Perform</h2>
+        <ol>
+            <li>Set the <strong>category</strong> and <strong>force item</strong> above, then save.</li>
+            <li>Write your <strong>prediction</strong> (the force item) on paper or in a sealed envelope.</li>
+            <li>Ask the spectator to open <code>/pick</code> on their phone.</li>
+            <li>They see a numbered list of 100 items. Let them browse freely.</li>
+            <li>Ask them to <strong>name any number from 1 to 100</strong>.</li>
+            <li>Take their phone. <strong>Triple-tap the header</strong> to open the secret pad.</li>
+            <li>Enter their number on the pad and tap <strong>&check;</strong> to confirm.</li>
+            <li>The force item silently moves to that position. The page scrolls there.</li>
+            <li>Show them: <em>"Number 42 is Paris!"</em> Then reveal your prediction.</li>
+        </ol>
+    </div>
+
+    <script>
+    const DATA = {
+        cities: [
+            "Paris","London","Tokyo","New York","Rome","Sydney","Cairo","Dubai",
+            "Bangkok","Barcelona","Berlin","Moscow","Mumbai","Beijing","Istanbul",
+            "Rio de Janeiro","Amsterdam","Singapore","Hong Kong","San Francisco",
+            "Toronto","Buenos Aires","Seoul","Mexico City","Dublin","Vienna",
+            "Prague","Lisbon","Athens","Copenhagen","Stockholm","Oslo","Helsinki",
+            "Warsaw","Budapest","Zurich","Geneva","Brussels","Edinburgh","Cape Town",
+            "Nairobi","Lagos","Marrakech","Jerusalem","Taipei","Manila","Jakarta",
+            "Kuala Lumpur","Hanoi","Havana","Lima","Bogota","Santiago","Reykjavik",
+            "Casablanca","Johannesburg","Vancouver","Montreal","Las Vegas","Miami",
+            "Chicago","Boston","Seattle","Los Angeles","Washington DC","New Orleans",
+            "Nashville","Denver","Portland","Honolulu","Cancun","Panama City",
+            "Cartagena","Quito","Montevideo","Sao Paulo","Florence","Venice",
+            "Milan","Nice","Lyon","Munich","Hamburg","Cologne","Krakow","Dubrovnik",
+            "Santorini","Kyoto","Shanghai","Ho Chi Minh City","Perth","Melbourne",
+            "Auckland","Doha","Muscat","Petra","Cusco","Zanzibar","Bruges","Tallinn"
+        ],
+        celebrities: [
+            "Albert Einstein","Leonardo da Vinci","William Shakespeare","Cleopatra",
+            "Napoleon Bonaparte","Mahatma Gandhi","Martin Luther King Jr","Nelson Mandela",
+            "Marie Curie","Charles Darwin","Isaac Newton","Galileo Galilei",
+            "Wolfgang Mozart","Ludwig van Beethoven","Frida Kahlo","Pablo Picasso",
+            "Marilyn Monroe","Elvis Presley","Michael Jackson","The Beatles",
+            "Muhammad Ali","Serena Williams","Usain Bolt","Michael Jordan",
+            "Oprah Winfrey","Walt Disney","Steve Jobs","Elon Musk",
+            "Queen Elizabeth II","Princess Diana","Abraham Lincoln","George Washington",
+            "Julius Caesar","Alexander the Great","Genghis Khan","Marco Polo",
+            "Christopher Columbus","Amelia Earhart","Neil Armstrong","Buzz Aldrin",
+            "Thomas Edison","Nikola Tesla","Alexander Graham Bell","Henry Ford",
+            "Wright Brothers","Ada Lovelace","Alan Turing","Grace Hopper",
+            "Sigmund Freud","Florence Nightingale","Mother Teresa","Dalai Lama",
+            "Pope Francis","Confucius","Socrates","Aristotle",
+            "Plato","Homer","Mark Twain","Ernest Hemingway",
+            "Jane Austen","Charles Dickens","Leo Tolstoy","Fyodor Dostoevsky",
+            "Vincent van Gogh","Claude Monet","Michelangelo","Rembrandt",
+            "Charlie Chaplin","Alfred Hitchcock","Steven Spielberg","Stanley Kubrick",
+            "Audrey Hepburn","Coco Chanel","David Bowie","Bob Marley",
+            "Freddie Mercury","John Lennon","Prince","Whitney Houston",
+            "Frank Sinatra","Louis Armstrong","Miles Davis","Jimi Hendrix",
+            "Bruce Lee","Jackie Chan","Pele","Diego Maradona",
+            "Tiger Woods","Roger Federer","Simone Biles","Lionel Messi",
+            "Cristiano Ronaldo","LeBron James","Tom Hanks","Meryl Streep",
+            "Morgan Freeman","Denzel Washington","Beyonce","Taylor Swift"
+        ],
+        foods: [
+            "Pizza","Sushi","Tacos","Pasta","Burger","Croissant","Dim Sum","Curry",
+            "Pad Thai","Ramen","Pho","Biryani","Paella","Risotto","Lasagna","Goulash",
+            "Fish and Chips","Kebab","Falafel","Hummus","Guacamole","Ceviche",
+            "Empanada","Churros","Baklava","Tiramisu","Cheesecake","Chocolate Cake",
+            "Ice Cream","Crepes","Waffles","Pancakes","French Toast","Eggs Benedict",
+            "Caesar Salad","Greek Salad","Tom Yum Soup","Miso Soup","Clam Chowder",
+            "Lobster","Oysters","Shrimp Cocktail","Salmon","Tuna Steak","Steak",
+            "Fried Chicken","BBQ Ribs","Pulled Pork","Beef Stew","Shepherd's Pie",
+            "Bangers and Mash","Peking Duck","Kung Pao Chicken","Sweet and Sour Pork",
+            "Spring Rolls","Dumplings","Naan Bread","Samosa","Tandoori Chicken",
+            "Butter Chicken","Vindaloo","Masala Dosa","Nasi Goreng","Satay",
+            "Bibimbap","Kimchi","Gyoza","Tempura","Mochi","Gelato","Macaron",
+            "Pretzel","Bratwurst","Schnitzel","Pierogi","Borscht","Moussaka",
+            "Souvlaki","Bruschetta","Prosciutto","Caprese Salad","Fondue",
+            "Raclette","Poutine","Jambalaya","Gumbo","Cornbread","Chili Con Carne",
+            "Nachos","Quesadilla","Burrito","Enchilada","Creme Brulee",
+            "Profiteroles","Apple Pie","Brownie","Banana Split","Pavlova",
+            "Sticky Toffee Pudding","Shakshuka"
+        ],
+        animals: [
+            "Lion","Elephant","Giraffe","Penguin","Dolphin","Eagle","Tiger","Bear",
+            "Wolf","Fox","Owl","Hawk","Falcon","Cheetah","Leopard","Jaguar",
+            "Gorilla","Chimpanzee","Orangutan","Panda","Koala","Kangaroo",
+            "Platypus","Crocodile","Alligator","Cobra","Python","Chameleon",
+            "Iguana","Tortoise","Sea Turtle","Shark","Whale","Octopus","Jellyfish",
+            "Seahorse","Starfish","Crab","Lobster","Flamingo","Peacock","Parrot",
+            "Toucan","Hummingbird","Swan","Pelican","Albatross","Rhinoceros",
+            "Hippopotamus","Zebra","Gazelle","Antelope","Buffalo","Moose","Elk",
+            "Deer","Rabbit","Hedgehog","Squirrel","Beaver","Otter","Seal",
+            "Walrus","Polar Bear","Arctic Fox","Reindeer","Wolverine","Badger",
+            "Raccoon","Skunk","Armadillo","Sloth","Anteater","Capybara","Llama",
+            "Alpaca","Camel","Horse","Donkey","Pig","Cow","Sheep","Goat",
+            "Rooster","Duck","Goose","Turkey","Salmon","Trout","Swordfish",
+            "Manta Ray","Clownfish","Pufferfish","Axolotl","Frog","Salamander",
+            "Dragonfly","Butterfly","Bee","Ant"
+        ],
+        countries: [
+            "France","Japan","Italy","Brazil","Australia","Egypt","India","Mexico",
+            "Thailand","Spain","Germany","Canada","Argentina","South Korea","Turkey",
+            "Greece","Portugal","Netherlands","Sweden","Norway","Denmark","Finland",
+            "Switzerland","Austria","Belgium","Ireland","Scotland","Poland","Czech Republic",
+            "Hungary","Croatia","Romania","Russia","Ukraine","Iceland","Morocco",
+            "South Africa","Kenya","Nigeria","Tanzania","Ethiopia","Ghana","Senegal",
+            "Colombia","Peru","Chile","Ecuador","Cuba","Jamaica","Costa Rica",
+            "Panama","Venezuela","Uruguay","Bolivia","China","Vietnam","Indonesia",
+            "Malaysia","Philippines","Singapore","Taiwan","Nepal","Sri Lanka",
+            "Cambodia","Myanmar","Laos","Mongolia","Pakistan","Bangladesh","Iran",
+            "Iraq","Israel","Jordan","Lebanon","Saudi Arabia","Qatar","Oman",
+            "New Zealand","Fiji","Samoa","Papua New Guinea","United States",
+            "United Kingdom","Luxembourg","Malta","Cyprus","Georgia","Armenia",
+            "Azerbaijan","Uzbekistan","Kazakhstan","Bhutan","Maldives","Madagascar",
+            "Mauritius","Seychelles","Belize","Guatemala","Honduras","Trinidad"
+        ]
+    };
+
+    const categorySelect = document.getElementById('category');
+    const forceItemSelect = document.getElementById('force-item');
+    const forceSearch = document.getElementById('force-search');
+    const saveBtn = document.getElementById('save-btn');
+    const statusEl = document.getElementById('status');
+    const configEl = document.getElementById('current-config');
+
+    function populateItems(filter) {
+        const cat = categorySelect.value;
+        const items = DATA[cat] || [];
+        const f = (filter || '').toLowerCase();
+        forceItemSelect.innerHTML = '';
+        items.filter(item => !f || item.toLowerCase().includes(f)).forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = item;
+            opt.textContent = item;
+            forceItemSelect.appendChild(opt);
+        });
+    }
+
+    categorySelect.addEventListener('change', () => {
+        forceSearch.value = '';
+        populateItems();
+    });
+
+    forceSearch.addEventListener('input', () => {
+        populateItems(forceSearch.value);
+    });
+
+    saveBtn.addEventListener('click', async () => {
+        const category = categorySelect.value;
+        const forceItem = forceItemSelect.value;
+        if (!forceItem) {
+            statusEl.textContent = 'Please select a force item';
+            statusEl.style.color = '#e94560';
+            return;
+        }
+        try {
+            const res = await fetch('/api/pick/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category, forceItem })
+            });
+            if (res.ok) {
+                statusEl.style.color = '#4ecdc4';
+                statusEl.textContent = 'Saved! Spectator page will use: ' + forceItem;
+                loadCurrentConfig();
+            }
+        } catch(e) {
+            statusEl.style.color = '#e94560';
+            statusEl.textContent = 'Error saving config';
+        }
+    });
+
+    async function loadCurrentConfig() {
+        try {
+            const res = await fetch('/api/pick/config');
+            const config = await res.json();
+            configEl.innerHTML = `
+                <strong>Current Config</strong><br>
+                Category: <strong>${config.category}</strong><br>
+                Force Item: <strong>${config.forceItem}</strong>
+            `;
+            // Set dropdowns to current config
+            categorySelect.value = config.category;
+            populateItems();
+            forceItemSelect.value = config.forceItem;
+        } catch(e) {
+            configEl.textContent = 'Could not load config';
+        }
+    }
+
+    populateItems();
+    loadCurrentConfig();
+    </script>
+</body>
+</html>

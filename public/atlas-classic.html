@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Countries & Cities | World Atlas Online</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f0f2f5;
+    color: #1a1a2e;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── Utility bar ── */
+  #util-bar {
+    background: #0d1b2a;
+    color: #8fa3b8;
+    font-size: 12px;
+    padding: 5px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #util-bar a { color: #7a97ae; text-decoration: none; margin: 0 6px; }
+  #util-bar a:hover { color: #fff; text-decoration: underline; }
+  #util-bar .sep { color: #3a4a5a; margin: 0 2px; }
+
+  /* ── Main header ── */
+  #main-header {
+    background: linear-gradient(135deg, #0d3b66 0%, #1a5276 60%, #1a6b8a 100%);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    border-bottom: 3px solid #0e7fa5;
+  }
+  #logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  #logo-text { display: flex; flex-direction: column; line-height: 1.2; }
+  #logo-main { color: #fff; font-size: 20px; font-weight: 700; font-family: Georgia, serif; }
+  #logo-sub  { color: #7ecbdf; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
+
+  #search-wrap { flex: 1; max-width: 500px; display: flex; margin-left: 10px; }
+  #search-input {
+    flex: 1; padding: 8px 12px; font-size: 14px; border: none;
+    border-radius: 3px 0 0 3px; outline: none;
+    background: rgba(255,255,255,0.92); color: #1a1a2e;
+  }
+  #search-btn {
+    background: #0e7fa5; color: #fff; border: none; padding: 0 18px;
+    font-size: 14px; cursor: pointer; border-radius: 0 3px 3px 0;
+    font-weight: 600;
+  }
+  #search-btn:hover { background: #0a6080; }
+
+  #header-stats { margin-left: auto; display: flex; gap: 20px; flex-shrink: 0; }
+  .stat-item { text-align: center; color: rgba(255,255,255,0.7); font-size: 11px; }
+  .stat-num  { display: block; font-size: 16px; font-weight: 700; color: #7ecbdf; line-height: 1.2; }
+
+  /* ── Continent tabs ── */
+  #continent-bar {
+    background: #1a4566;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 20px;
+    gap: 2px;
+    border-bottom: 1px solid #0e2a40;
+  }
+  .cont-tab {
+    color: #7fa8c4; padding: 11px 18px; font-size: 13px; font-weight: 600;
+    cursor: pointer; border-bottom: 3px solid transparent; display: flex;
+    align-items: center; gap: 6px; transition: color 0.15s; letter-spacing: 0.3px;
+    background: none; border-top: none; border-left: none; border-right: none;
+    font-family: Arial, sans-serif;
+  }
+  .cont-tab:hover { color: #cde8f5; }
+  .cont-tab.active { color: #fff; border-bottom: 3px solid #0eb8e8; background: rgba(255,255,255,0.06); }
+
+  /* ── Breadcrumb ── */
+  #breadcrumb {
+    background: #e4e9ef; border-bottom: 1px solid #cdd4dc;
+    padding: 7px 20px; font-size: 12px; color: #5a6a7a;
+  }
+  #breadcrumb a { color: #0d3b66; text-decoration: none; }
+  #breadcrumb a:hover { text-decoration: underline; }
+  #breadcrumb .sep { color: #9aa5b0; margin: 0 5px; }
+
+  /* ── Page layout ── */
+  #page-wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 20px 20px 50px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  /* ── Country panel (left) ── */
+  #country-panel {
+    width: 220px;
+    flex-shrink: 0;
+    background: #fff;
+    border: 1px solid #d0d8e4;
+    border-top: 3px solid #0d3b66;
+  }
+  #country-panel-head {
+    background: #f0f4f8;
+    border-bottom: 1px solid #d0d8e4;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  #country-panel-head h2 { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #3a4a5a; }
+  #country-count { font-size: 11px; color: #7a8a9a; background: #dde3ea; padding: 2px 7px; border-radius: 10px; }
+
+  #country-list { list-style: none; max-height: 560px; overflow-y: auto; }
+  #country-list::-webkit-scrollbar { width: 5px; }
+  #country-list::-webkit-scrollbar-track { background: #f0f2f5; }
+  #country-list::-webkit-scrollbar-thumb { background: #b0bec8; border-radius: 3px; }
+
+  .country-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-bottom: 1px solid #f0f2f5;
+    cursor: pointer; font-size: 13.5px; color: #1a3050;
+    transition: background 0.12s;
+  }
+  .country-item:hover { background: #eaf2fb; color: #0d3b66; }
+  .country-item.active {
+    background: #ddeefa; color: #0d3b66; font-weight: 700;
+    border-left: 3px solid #0e7fa5; padding-left: 11px;
+  }
+  .country-flag { font-size: 16px; line-height: 1; flex-shrink: 0; }
+  .country-city-count { margin-left: auto; font-size: 11px; color: #9aabb8; }
+
+  /* ── City panel (right) ── */
+  #city-panel {
+    flex: 1; min-width: 0; background: #fff;
+    border: 1px solid #d0d8e4; border-top: 3px solid #0e7fa5;
+    padding: 22px 24px 28px;
+  }
+  #city-panel-top {
+    display: flex; align-items: flex-start; gap: 20px;
+    margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid #e8edf3;
+  }
+  #country-headline { flex: 1; }
+  #country-name-display { font-family: Georgia, serif; font-size: 28px; color: #0d3b66; font-weight: 400; line-height: 1.2; margin-bottom: 4px; }
+  #country-continent-display { font-size: 12px; color: #7a8a9a; letter-spacing: 1.5px; text-transform: uppercase; }
+  #country-facts { display: flex; gap: 24px; flex-shrink: 0; }
+  .fact-block { text-align: center; }
+  .fact-label { font-size: 10px; color: #9aabb8; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 3px; }
+  .fact-value { font-size: 14px; font-weight: 700; color: #1a3050; }
+
+  #cities-section-label {
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: #7a8a9a; margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+  }
+  #cities-section-label::after { content: ''; flex: 1; height: 1px; background: #e4e9ef; }
+
+  #city-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+  .city-btn {
+    display: block; background: none; border: none;
+    border-bottom: 1px solid #f0f3f7; border-right: 1px solid #f0f3f7;
+    padding: 10px 12px; font-size: 13.5px; color: #1a6b8a;
+    font-family: Arial, sans-serif; cursor: pointer; text-align: left;
+    transition: background 0.1s, color 0.1s;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .city-btn::before { content: '◉'; font-size: 8px; color: #b0c8d8; flex-shrink: 0; }
+  .city-btn:hover { background: #eaf4fb; color: #0d3b66; text-decoration: underline; }
+  .city-btn:hover::before { color: #0e7fa5; }
+
+  #empty-state { padding: 40px 0; text-align: center; color: #8a9aaa; font-size: 14px; font-style: italic; }
+  #empty-state .arrow-hint { font-style: normal; font-size: 28px; display: block; margin-bottom: 12px; color: #b0c8d8; }
+
+  /* ── Popup ── */
+  #info-popup {
+    position: fixed; z-index: 9999; pointer-events: none;
+    width: 290px; background: #fff;
+    border: 1px solid #c0cdd8; border-top: 3px solid #0d3b66;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.16);
+    padding: 14px 16px 16px; display: none; font-family: Arial, sans-serif;
+  }
+  #popup-name { font-family: Georgia, serif; font-size: 16px; color: #0d3b66; font-weight: 700; margin-bottom: 3px; }
+  #popup-type { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #0e7fa5; margin-bottom: 10px; font-weight: 600; }
+  .popup-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #f0f3f7; font-size: 12.5px; }
+  .popup-row:last-child { border-bottom: none; }
+  .popup-row-key { color: #7a8a9a; }
+  .popup-row-val { font-weight: 600; color: #1a2a3a; text-align: right; max-width: 160px; }
+
+  /* ── Footer ── */
+  #footer {
+    background: #0d1b2a; color: #7a8a9a; padding: 14px 20px;
+    font-size: 12px; display: flex; justify-content: space-between;
+    align-items: center; flex-wrap: wrap; gap: 8px;
+  }
+  #footer a { color: #5a7a90; text-decoration: none; margin: 0 8px; }
+  #footer a:hover { color: #cde8f5; text-decoration: underline; }
+
+  @media (max-width: 780px) {
+    #country-panel { display: none; }
+    #city-grid { grid-template-columns: repeat(2, 1fr); }
+    #header-stats { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="util-bar">
+  <div>
+    <a href="#">Maps</a><span class="sep">|</span>
+    <a href="#">Flags</a><span class="sep">|</span>
+    <a href="#">Statistics</a><span class="sep">|</span>
+    <a href="#">Compare Countries</a>
+  </div>
+  <div>
+    <a href="#">About</a><span class="sep">|</span>
+    <a href="#">Data Sources</a><span class="sep">|</span>
+    <a href="#">API</a>
+  </div>
+</div>
+
+<div id="main-header">
+  <a id="logo-wrap" href="#">
+    <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="19" cy="19" r="17" stroke="#7ecbdf" stroke-width="1.5" fill="none"/>
+      <ellipse cx="19" cy="19" rx="8" ry="17" stroke="#7ecbdf" stroke-width="1" fill="none"/>
+      <line x1="2" y1="19" x2="36" y2="19" stroke="#7ecbdf" stroke-width="1"/>
+      <path d="M4 12 Q19 8 34 12" stroke="#7ecbdf" stroke-width="0.8" fill="none"/>
+      <path d="M4 26 Q19 30 34 26" stroke="#7ecbdf" stroke-width="0.8" fill="none"/>
+    </svg>
+    <div id="logo-text">
+      <span id="logo-main">World Atlas Online</span>
+      <span id="logo-sub">Countries &amp; Cities Reference</span>
+    </div>
+  </a>
+  <div id="search-wrap">
+    <input id="search-input" type="text" placeholder="Search countries or cities&hellip;" autocomplete="off">
+    <button id="search-btn">Search</button>
+  </div>
+  <div id="header-stats">
+    <div class="stat-item"><span class="stat-num">195</span>Countries</div>
+    <div class="stat-item"><span class="stat-num">4,400+</span>Cities</div>
+    <div class="stat-item"><span class="stat-num">5</span>Continents</div>
+  </div>
+</div>
+
+<div id="continent-bar">
+  <button class="cont-tab" data-continent="Africa">🌍 Africa</button>
+  <button class="cont-tab" data-continent="Americas">🌎 Americas</button>
+  <button class="cont-tab" data-continent="Asia">🌏 Asia</button>
+  <button class="cont-tab" data-continent="Europe">🏰 Europe</button>
+  <button class="cont-tab" data-continent="Oceania">🏝 Oceania</button>
+</div>
+
+<div id="breadcrumb">
+  <a href="#">Home</a><span class="sep">›</span>
+  <a href="#">Atlas</a>
+  <span class="sep" id="bc-sep2" style="display:none">›</span>
+  <span id="bc-continent"></span>
+  <span class="sep" id="bc-sep3" style="display:none">›</span>
+  <span id="bc-country"></span>
+</div>
+
+<div id="page-wrap">
+  <div id="country-panel">
+    <div id="country-panel-head">
+      <h2>Countries</h2>
+      <span id="country-count"></span>
+    </div>
+    <ul id="country-list"></ul>
+  </div>
+
+  <div id="city-panel">
+    <div id="city-panel-top">
+      <div id="country-headline">
+        <div id="country-name-display">Select a country</div>
+        <div id="country-continent-display"></div>
+      </div>
+      <div id="country-facts"></div>
+    </div>
+    <div id="cities-section-label">Cities &amp; Towns</div>
+    <div id="city-grid">
+      <div id="empty-state">
+        <span class="arrow-hint">←</span>
+        Choose a continent above, then select a country to browse its cities.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="info-popup">
+  <div id="popup-name"></div>
+  <div id="popup-type"></div>
+  <div id="popup-rows"></div>
+</div>
+
+<div id="footer">
+  <span>&copy; 2024 World Atlas Online &mdash; Geographic Reference Database</span>
+  <div>
+    <a href="#">Privacy Policy</a>
+    <a href="#">Terms of Use</a>
+    <a href="#">Data Accuracy</a>
+    <a href="#">Contact</a>
+  </div>
+</div>
+
+<script>
+const DB_URL = 'https://global-search-stats-default-rtdb.firebaseio.com/chosenPlace.json';
+
+const CONTINENTS = {
+  'Africa':   ['Algeria','Angola','Cameroon','Egypt','Ethiopia','Ghana','Kenya','Morocco','Mozambique','Nigeria','Senegal','South Africa','Tanzania','Tunisia','Uganda','Zimbabwe'],
+  'Americas': ['Argentina','Bolivia','Brazil','Canada','Chile','Colombia','Cuba','Dominican Republic','Ecuador','Guatemala','Jamaica','Mexico','Peru','United States','Venezuela'],
+  'Asia':     ['Bangladesh','China','India','Indonesia','Iran','Iraq','Israel','Japan','Kazakhstan','Malaysia','Myanmar','Pakistan','Philippines','Russia','Saudi Arabia','South Korea','Thailand','Turkey','United Arab Emirates','Vietnam'],
+  'Europe':   ['Austria','Belgium','Croatia','Czech Republic','Denmark','Finland','France','Germany','Greece','Hungary','Iceland','Ireland','Italy','Netherlands','Norway','Poland','Portugal','Romania','Serbia','Slovakia','Spain','Sweden','Switzerland','Ukraine','United Kingdom'],
+  'Oceania':  ['Australia','Fiji','New Zealand','Papua New Guinea','Samoa','Solomon Islands','Tonga','Vanuatu']
+};
+
+const COUNTRY_DATA = {
+  'Algeria':      { flag:'🇩🇿', capital:'Algiers',       pop:'44.9M', area:'2,381,741 km²', currency:'Algerian Dinar',          lang:'Arabic, Tamazight',            cities:['Algiers','Oran','Constantine','Annaba','Blida','Tlemcen','Sétif','Batna'] },
+  'Angola':       { flag:'🇦🇴', capital:'Luanda',        pop:'34.5M', area:'1,246,700 km²', currency:'Kwanza',                  lang:'Portuguese',                   cities:['Luanda','Huambo','Lobito','Benguela','Kuito','Lubango'] },
+  'Cameroon':     { flag:'🇨🇲', capital:'Yaoundé',       pop:'28.1M', area:'475,442 km²',   currency:'CFA Franc',               lang:'French, English',              cities:['Yaoundé','Douala','Garoua','Bamenda','Maroua','Bafoussam'] },
+  'Egypt':        { flag:'🇪🇬', capital:'Cairo',         pop:'106M',  area:'1,001,449 km²', currency:'Egyptian Pound',          lang:'Arabic',                       cities:['Cairo','Alexandria','Giza','Luxor','Aswan','Port Said','Suez','Sharm el-Sheikh'] },
+  'Ethiopia':     { flag:'🇪🇹', capital:'Addis Ababa',   pop:'126M',  area:'1,104,300 km²', currency:'Birr',                    lang:'Amharic',                      cities:['Addis Ababa','Dire Dawa','Bahir Dar','Hawassa','Mekele','Adama','Jimma'] },
+  'Ghana':        { flag:'🇬🇭', capital:'Accra',         pop:'33.5M', area:'238,533 km²',   currency:'Ghanaian Cedi',           lang:'English',                      cities:['Accra','Kumasi','Tamale','Sekondi-Takoradi','Cape Coast','Obuasi'] },
+  'Kenya':        { flag:'🇰🇪', capital:'Nairobi',       pop:'56.2M', area:'580,367 km²',   currency:'Kenyan Shilling',         lang:'Swahili, English',             cities:['Nairobi','Mombasa','Kisumu','Nakuru','Eldoret','Thika','Malindi'] },
+  'Morocco':      { flag:'🇲🇦', capital:'Rabat',         pop:'37.5M', area:'446,550 km²',   currency:'Moroccan Dirham',         lang:'Arabic, Tamazight',            cities:['Casablanca','Rabat','Fez','Marrakech','Agadir','Tangier','Oujda','Meknes'] },
+  'Mozambique':   { flag:'🇲🇿', capital:'Maputo',        pop:'33.9M', area:'801,590 km²',   currency:'Metical',                 lang:'Portuguese',                   cities:['Maputo','Matola','Beira','Nampula','Chimoio','Quelimane'] },
+  'Nigeria':      { flag:'🇳🇬', capital:'Abuja',         pop:'218M',  area:'923,768 km²',   currency:'Nigerian Naira',          lang:'English',                      cities:['Lagos','Abuja','Kano','Ibadan','Port Harcourt','Benin City','Kaduna','Enugu','Ilorin','Jos'] },
+  'Senegal':      { flag:'🇸🇳', capital:'Dakar',         pop:'17.9M', area:'196,722 km²',   currency:'CFA Franc',               lang:'French, Wolof',                cities:['Dakar','Thiès','Kaolack','Saint-Louis','Ziguinchor','Mbour'] },
+  'South Africa': { flag:'🇿🇦', capital:'Pretoria',      pop:'60.6M', area:'1,219,090 km²', currency:'South African Rand',      lang:'11 official languages',        cities:['Johannesburg','Cape Town','Durban','Pretoria','Port Elizabeth','Bloemfontein','East London','Polokwane'] },
+  'Tanzania':     { flag:'🇹🇿', capital:'Dodoma',        pop:'65.5M', area:'945,087 km²',   currency:'Tanzanian Shilling',      lang:'Swahili, English',             cities:['Dar es Salaam','Dodoma','Zanzibar City','Mwanza','Arusha','Morogoro','Tanga'] },
+  'Tunisia':      { flag:'🇹🇳', capital:'Tunis',         pop:'12.1M', area:'163,610 km²',   currency:'Tunisian Dinar',          lang:'Arabic',                       cities:['Tunis','Sfax','Sousse','Kairouan','Bizerte','Gabès','Ariana'] },
+  'Uganda':       { flag:'🇺🇬', capital:'Kampala',       pop:'48.6M', area:'241,551 km²',   currency:'Ugandan Shilling',        lang:'English, Swahili',             cities:['Kampala','Gulu','Lira','Mbarara','Jinja','Mukono','Mbale'] },
+  'Zimbabwe':     { flag:'🇿🇼', capital:'Harare',        pop:'16.5M', area:'390,757 km²',   currency:'RTGS Dollar',             lang:'16 official languages',        cities:['Harare','Bulawayo','Chitungwiza','Mutare','Gweru','Kwekwe','Kadoma'] },
+  'Argentina':    { flag:'🇦🇷', capital:'Buenos Aires',  pop:'46.2M', area:'2,780,400 km²', currency:'Argentine Peso',          lang:'Spanish',                      cities:['Buenos Aires','Córdoba','Rosario','Mendoza','Tucumán','Mar del Plata','Salta','La Plata'] },
+  'Bolivia':      { flag:'🇧🇴', capital:'Sucre',         pop:'12.1M', area:'1,098,581 km²', currency:'Boliviano',               lang:'Spanish, Quechua, Aymara',     cities:['Sucre','La Paz','Santa Cruz','Cochabamba','Oruro','Potosí','Tarija'] },
+  'Brazil':       { flag:'🇧🇷', capital:'Brasília',      pop:'215M',  area:'8,515,767 km²', currency:'Brazilian Real',          lang:'Portuguese',                   cities:['São Paulo','Rio de Janeiro','Brasília','Salvador','Fortaleza','Belo Horizonte','Manaus','Curitiba','Recife','Porto Alegre','Belém','Goiânia'] },
+  'Canada':       { flag:'🇨🇦', capital:'Ottawa',        pop:'38.9M', area:'9,984,670 km²', currency:'Canadian Dollar',         lang:'English, French',              cities:['Toronto','Montreal','Vancouver','Calgary','Edmonton','Ottawa','Winnipeg','Quebec City','Hamilton','Kitchener'] },
+  'Chile':        { flag:'🇨🇱', capital:'Santiago',      pop:'19.6M', area:'756,102 km²',   currency:'Chilean Peso',            lang:'Spanish',                      cities:['Santiago','Valparaíso','Concepción','Antofagasta','Viña del Mar','Temuco','Rancagua','Arica'] },
+  'Colombia':     { flag:'🇨🇴', capital:'Bogotá',        pop:'51.9M', area:'1,141,748 km²', currency:'Colombian Peso',          lang:'Spanish',                      cities:['Bogotá','Medellín','Cali','Barranquilla','Cartagena','Cúcuta','Bucaramanga','Pereira'] },
+  'Cuba':         { flag:'🇨🇺', capital:'Havana',        pop:'11.2M', area:'109,884 km²',   currency:'Cuban Peso',              lang:'Spanish',                      cities:['Havana','Santiago de Cuba','Camagüey','Holguín','Santa Clara','Guantánamo'] },
+  'Dominican Republic': { flag:'🇩🇴', capital:'Santo Domingo', pop:'10.9M', area:'48,671 km²', currency:'Dominican Peso',     lang:'Spanish',                      cities:['Santo Domingo','Santiago','San Pedro de Macorís','La Romana','San Cristóbal','Puerto Plata'] },
+  'Ecuador':      { flag:'🇪🇨', capital:'Quito',         pop:'18.2M', area:'283,561 km²',   currency:'US Dollar',               lang:'Spanish',                      cities:['Quito','Guayaquil','Cuenca','Santo Domingo','Ambato','Portoviejo','Machala'] },
+  'Guatemala':    { flag:'🇬🇹', capital:'Guatemala City',pop:'17.6M', area:'108,889 km²',   currency:'Quetzal',                 lang:'Spanish',                      cities:['Guatemala City','Mixco','Villa Nueva','Quetzaltenango','Escuintla','Cobán'] },
+  'Jamaica':      { flag:'🇯🇲', capital:'Kingston',      pop:'2.8M',  area:'10,991 km²',    currency:'Jamaican Dollar',         lang:'English',                      cities:['Kingston','Spanish Town','Portmore','Montego Bay','May Pen','Mandeville'] },
+  'Mexico':       { flag:'🇲🇽', capital:'Mexico City',   pop:'130M',  area:'1,964,375 km²', currency:'Mexican Peso',            lang:'Spanish',                      cities:['Mexico City','Guadalajara','Monterrey','Puebla','Tijuana','León','Juárez','Torreón','Querétaro','Mérida','Cancún','Acapulco'] },
+  'Peru':         { flag:'🇵🇪', capital:'Lima',          pop:'33.4M', area:'1,285,216 km²', currency:'Peruvian Sol',            lang:'Spanish, Quechua',             cities:['Lima','Arequipa','Trujillo','Chiclayo','Piura','Iquitos','Cusco','Huancayo','Tacna'] },
+  'United States':{ flag:'🇺🇸', capital:'Washington D.C.',pop:'335M', area:'9,833,517 km²', currency:'US Dollar',              lang:'English',                      cities:['New York','Los Angeles','Chicago','Houston','Phoenix','Philadelphia','San Antonio','San Diego','Dallas','San Francisco','Seattle','Miami','Boston','Denver','Atlanta','Las Vegas','Portland','Detroit','Nashville','New Orleans'] },
+  'Venezuela':    { flag:'🇻🇪', capital:'Caracas',       pop:'28.3M', area:'916,445 km²',   currency:'Bolívar Soberano',        lang:'Spanish',                      cities:['Caracas','Maracaibo','Valencia','Barquisimeto','Maracay','Ciudad Guayana','Maturín'] },
+  'Bangladesh':   { flag:'🇧🇩', capital:'Dhaka',         pop:'170M',  area:'147,570 km²',   currency:'Taka',                    lang:'Bengali',                      cities:['Dhaka','Chittagong','Sylhet','Khulna','Rajshahi','Comilla','Mymensingh','Gazipur'] },
+  'China':        { flag:'🇨🇳', capital:'Beijing',       pop:'1.41B', area:'9,596,960 km²', currency:'Renminbi (Yuan)',         lang:'Mandarin Chinese',             cities:['Shanghai','Beijing','Guangzhou','Shenzhen','Chengdu','Tianjin','Wuhan','Xi\'an','Hangzhou','Chongqing','Nanjing','Dongguan','Shenyang','Harbin'] },
+  'India':        { flag:'🇮🇳', capital:'New Delhi',     pop:'1.43B', area:'3,287,263 km²', currency:'Indian Rupee',            lang:'Hindi, English + 21 others',   cities:['Mumbai','Delhi','Bangalore','Hyderabad','Chennai','Kolkata','Pune','Ahmedabad','Jaipur','Surat','Lucknow','Kanpur','Nagpur','Indore','Bhopal','Visakhapatnam'] },
+  'Indonesia':    { flag:'🇮🇩', capital:'Jakarta',       pop:'277M',  area:'1,904,569 km²', currency:'Indonesian Rupiah',       lang:'Indonesian',                   cities:['Jakarta','Surabaya','Bandung','Medan','Bekasi','Tangerang','Semarang','Makassar','Palembang','Batam','Pekanbaru','Yogyakarta'] },
+  'Iran':         { flag:'🇮🇷', capital:'Tehran',        pop:'88.6M', area:'1,648,195 km²', currency:'Iranian Rial',            lang:'Persian (Farsi)',              cities:['Tehran','Mashhad','Isfahan','Karaj','Shiraz','Tabriz','Qom','Ahvaz','Kermanshah','Urmia'] },
+  'Iraq':         { flag:'🇮🇶', capital:'Baghdad',       pop:'43.5M', area:'438,317 km²',   currency:'Iraqi Dinar',             lang:'Arabic, Kurdish',              cities:['Baghdad','Mosul','Basra','Erbil','Sulaymaniyah','Kirkuk','Najaf','Karbala'] },
+  'Israel':       { flag:'🇮🇱', capital:'Jerusalem',     pop:'9.5M',  area:'20,770 km²',    currency:'New Shekel',              lang:'Hebrew, Arabic',               cities:['Jerusalem','Tel Aviv','Haifa','Rishon LeZion','Petah Tikva','Ashdod','Netanya','Beer Sheba'] },
+  'Japan':        { flag:'🇯🇵', capital:'Tokyo',         pop:'124M',  area:'377,930 km²',   currency:'Japanese Yen',            lang:'Japanese',                     cities:['Tokyo','Osaka','Yokohama','Nagoya','Sapporo','Kobe','Kyoto','Fukuoka','Hiroshima','Sendai','Kawasaki','Chiba','Kitakyushu'] },
+  'Kazakhstan':   { flag:'🇰🇿', capital:'Astana',        pop:'19.7M', area:'2,724,900 km²', currency:'Kazakhstani Tenge',       lang:'Kazakh, Russian',              cities:['Almaty','Astana','Shymkent','Karaganda','Aktobe','Taraz','Pavlodar'] },
+  'Malaysia':     { flag:'🇲🇾', capital:'Kuala Lumpur',  pop:'33.6M', area:'329,847 km²',   currency:'Malaysian Ringgit',       lang:'Malay',                        cities:['Kuala Lumpur','Penang','Johor Bahru','Ipoh','Petaling Jaya','Subang Jaya','Shah Alam','Kota Kinabalu'] },
+  'Myanmar':      { flag:'🇲🇲', capital:'Naypyidaw',     pop:'53.4M', area:'676,578 km²',   currency:'Kyat',                    lang:'Burmese',                      cities:['Naypyidaw','Yangon','Mandalay','Mawlamyine','Bago','Pathein','Monywa'] },
+  'Pakistan':     { flag:'🇵🇰', capital:'Islamabad',     pop:'231M',  area:'881,913 km²',   currency:'Pakistani Rupee',         lang:'Urdu, English',                cities:['Karachi','Lahore','Faisalabad','Rawalpindi','Gujranwala','Peshawar','Multan','Islamabad','Quetta','Sialkot'] },
+  'Philippines':  { flag:'🇵🇭', capital:'Manila',        pop:'115M',  area:'300,000 km²',   currency:'Philippine Peso',         lang:'Filipino, English',            cities:['Manila','Quezon City','Davao','Caloocan','Cebu City','Zamboanga','Antipolo','Taguig','Pasig'] },
+  'Russia':       { flag:'🇷🇺', capital:'Moscow',        pop:'144M',  area:'17,098,242 km²',currency:'Russian Ruble',           lang:'Russian',                      cities:['Moscow','Saint Petersburg','Novosibirsk','Yekaterinburg','Kazan','Nizhny Novgorod','Chelyabinsk','Omsk','Samara','Rostov-on-Don','Ufa','Krasnoyarsk','Vladivostok'] },
+  'Saudi Arabia': { flag:'🇸🇦', capital:'Riyadh',        pop:'36.4M', area:'2,149,690 km²', currency:'Saudi Riyal',             lang:'Arabic',                       cities:['Riyadh','Jeddah','Mecca','Medina','Dammam','Taif','Tabuk','Khobar'] },
+  'South Korea':  { flag:'🇰🇷', capital:'Seoul',         pop:'51.7M', area:'100,210 km²',   currency:'South Korean Won',        lang:'Korean',                       cities:['Seoul','Busan','Incheon','Daegu','Daejeon','Gwangju','Suwon','Ulsan','Seongnam','Jeonju'] },
+  'Thailand':     { flag:'🇹🇭', capital:'Bangkok',       pop:'71.7M', area:'513,120 km²',   currency:'Thai Baht',               lang:'Thai',                         cities:['Bangkok','Nonthaburi','Nakhon Ratchasima','Chiang Mai','Hat Yai','Udon Thani','Pattaya','Phuket','Chiang Rai'] },
+  'Turkey':       { flag:'🇹🇷', capital:'Ankara',        pop:'85.3M', area:'783,562 km²',   currency:'Turkish Lira',            lang:'Turkish',                      cities:['Istanbul','Ankara','Izmir','Bursa','Adana','Gaziantep','Konya','Antalya','Mersin','Kayseri'] },
+  'United Arab Emirates': { flag:'🇦🇪', capital:'Abu Dhabi', pop:'10.0M', area:'83,600 km²', currency:'UAE Dirham',           lang:'Arabic',                       cities:['Dubai','Abu Dhabi','Sharjah','Al Ain','Ajman','Ras Al Khaimah','Fujairah'] },
+  'Vietnam':      { flag:'🇻🇳', capital:'Hanoi',         pop:'98.2M', area:'331,212 km²',   currency:'Vietnamese Đồng',        lang:'Vietnamese',                   cities:['Ho Chi Minh City','Hanoi','Da Nang','Hai Phong','Can Tho','Bien Hoa','Hue','Nha Trang','Vung Tau'] },
+  'Austria':      { flag:'🇦🇹', capital:'Vienna',        pop:'9.1M',  area:'83,871 km²',    currency:'Euro',                    lang:'German',                       cities:['Vienna','Graz','Linz','Salzburg','Innsbruck','Klagenfurt','Villach','Wels'] },
+  'Belgium':      { flag:'🇧🇪', capital:'Brussels',      pop:'11.6M', area:'30,528 km²',    currency:'Euro',                    lang:'Dutch, French, German',        cities:['Brussels','Antwerp','Ghent','Charleroi','Liège','Bruges','Leuven','Namur'] },
+  'Croatia':      { flag:'🇭🇷', capital:'Zagreb',        pop:'3.9M',  area:'56,594 km²',    currency:'Euro',                    lang:'Croatian',                     cities:['Zagreb','Split','Rijeka','Osijek','Zadar','Slavonski Brod','Pula'] },
+  'Czech Republic':{ flag:'🇨🇿', capital:'Prague',       pop:'10.9M', area:'78,866 km²',    currency:'Czech Koruna',            lang:'Czech',                        cities:['Prague','Brno','Ostrava','Pilsen','Olomouc','Liberec','Hradec Králové'] },
+  'Denmark':      { flag:'🇩🇰', capital:'Copenhagen',    pop:'5.9M',  area:'42,924 km²',    currency:'Danish Krone',            lang:'Danish',                       cities:['Copenhagen','Aarhus','Odense','Aalborg','Frederiksberg','Esbjerg'] },
+  'Finland':      { flag:'🇫🇮', capital:'Helsinki',      pop:'5.5M',  area:'338,145 km²',   currency:'Euro',                    lang:'Finnish, Swedish',             cities:['Helsinki','Espoo','Tampere','Vantaa','Oulu','Turku','Jyväskylä','Lahti'] },
+  'France':       { flag:'🇫🇷', capital:'Paris',         pop:'68.4M', area:'551,695 km²',   currency:'Euro',                    lang:'French',                       cities:['Paris','Marseille','Lyon','Toulouse','Nice','Nantes','Strasbourg','Bordeaux','Lille','Rennes','Reims','Grenoble','Dijon'] },
+  'Germany':      { flag:'🇩🇪', capital:'Berlin',        pop:'84.4M', area:'357,114 km²',   currency:'Euro',                    lang:'German',                       cities:['Berlin','Hamburg','Munich','Cologne','Frankfurt','Stuttgart','Düsseldorf','Leipzig','Dortmund','Dresden','Bremen','Hannover','Nuremberg'] },
+  'Greece':       { flag:'🇬🇷', capital:'Athens',        pop:'10.4M', area:'131,957 km²',   currency:'Euro',                    lang:'Greek',                        cities:['Athens','Thessaloniki','Patras','Piraeus','Larissa','Heraklion','Peristeri','Kallithea'] },
+  'Hungary':      { flag:'🇭🇺', capital:'Budapest',      pop:'9.7M',  area:'93,028 km²',    currency:'Hungarian Forint',        lang:'Hungarian',                    cities:['Budapest','Debrecen','Miskolc','Szeged','Pécs','Győr','Nyíregyháza','Kecskemét'] },
+  'Iceland':      { flag:'🇮🇸', capital:'Reykjavik',     pop:'0.4M',  area:'103,000 km²',   currency:'Icelandic Króna',         lang:'Icelandic',                    cities:['Reykjavik','Kópavogur','Hafnarfjörður','Akureyri','Reykjanesbær','Garðabær'] },
+  'Ireland':      { flag:'🇮🇪', capital:'Dublin',        pop:'5.1M',  area:'70,273 km²',    currency:'Euro',                    lang:'Irish, English',               cities:['Dublin','Cork','Limerick','Galway','Waterford','Drogheda','Dundalk','Swords'] },
+  'Italy':        { flag:'🇮🇹', capital:'Rome',          pop:'59.0M', area:'301,340 km²',   currency:'Euro',                    lang:'Italian',                      cities:['Rome','Milan','Naples','Turin','Palermo','Genoa','Bologna','Florence','Venice','Catania','Bari','Verona','Messina','Padua'] },
+  'Netherlands':  { flag:'🇳🇱', capital:'Amsterdam',     pop:'17.9M', area:'41,543 km²',    currency:'Euro',                    lang:'Dutch',                        cities:['Amsterdam','Rotterdam','The Hague','Utrecht','Eindhoven','Groningen','Tilburg','Almere','Breda'] },
+  'Norway':       { flag:'🇳🇴', capital:'Oslo',          pop:'5.5M',  area:'385,207 km²',   currency:'Norwegian Krone',         lang:'Norwegian',                    cities:['Oslo','Bergen','Stavanger','Trondheim','Drammen','Fredrikstad','Kristiansand'] },
+  'Poland':       { flag:'🇵🇱', capital:'Warsaw',        pop:'37.9M', area:'312,679 km²',   currency:'Polish Złoty',            lang:'Polish',                       cities:['Warsaw','Kraków','Łódź','Wrocław','Poznań','Gdańsk','Szczecin','Bydgoszcz','Lublin','Katowice'] },
+  'Portugal':     { flag:'🇵🇹', capital:'Lisbon',        pop:'10.3M', area:'92,212 km²',    currency:'Euro',                    lang:'Portuguese',                   cities:['Lisbon','Porto','Braga','Coimbra','Funchal','Setúbal','Amadora','Almada'] },
+  'Romania':      { flag:'🇷🇴', capital:'Bucharest',     pop:'19.0M', area:'238,397 km²',   currency:'Romanian Leu',            lang:'Romanian',                     cities:['Bucharest','Cluj-Napoca','Timișoara','Iași','Constanța','Craiova','Galați','Brașov'] },
+  'Serbia':       { flag:'🇷🇸', capital:'Belgrade',      pop:'6.8M',  area:'77,474 km²',    currency:'Serbian Dinar',           lang:'Serbian',                      cities:['Belgrade','Novi Sad','Niš','Kragujevac','Subotica','Zrenjanin','Pančevo'] },
+  'Slovakia':     { flag:'🇸🇰', capital:'Bratislava',    pop:'5.5M',  area:'49,035 km²',    currency:'Euro',                    lang:'Slovak',                       cities:['Bratislava','Košice','Prešov','Žilina','Nitra','Banská Bystrica','Trnava'] },
+  'Spain':        { flag:'🇪🇸', capital:'Madrid',        pop:'47.8M', area:'505,990 km²',   currency:'Euro',                    lang:'Spanish',                      cities:['Madrid','Barcelona','Valencia','Seville','Zaragoza','Málaga','Murcia','Palma','Las Palmas','Bilbao','Alicante','Córdoba'] },
+  'Sweden':       { flag:'🇸🇪', capital:'Stockholm',     pop:'10.5M', area:'450,295 km²',   currency:'Swedish Krona',           lang:'Swedish',                      cities:['Stockholm','Gothenburg','Malmö','Uppsala','Västerås','Örebro','Linköping','Helsingborg','Jönköping'] },
+  'Switzerland':  { flag:'🇨🇭', capital:'Bern',          pop:'8.8M',  area:'41,285 km²',    currency:'Swiss Franc',             lang:'German, French, Italian, Romansh', cities:['Zurich','Geneva','Basel','Bern','Lausanne','Winterthur','St. Gallen','Lucerne'] },
+  'Ukraine':      { flag:'🇺🇦', capital:'Kyiv',          pop:'43.5M', area:'603,550 km²',   currency:'Ukrainian Hryvnia',       lang:'Ukrainian',                    cities:['Kyiv','Kharkiv','Odessa','Dnipro','Lviv','Zaporizhzhia','Mykolaiv','Vinnytsia'] },
+  'United Kingdom':{ flag:'🇬🇧', capital:'London',       pop:'67.7M', area:'242,495 km²',   currency:'Pound Sterling',          lang:'English',                      cities:['London','Birmingham','Manchester','Glasgow','Leeds','Sheffield','Bradford','Liverpool','Edinburgh','Bristol','Leicester','Cardiff','Belfast','Nottingham'] },
+  'Australia':    { flag:'🇦🇺', capital:'Canberra',      pop:'26.5M', area:'7,741,220 km²', currency:'Australian Dollar',       lang:'English',                      cities:['Sydney','Melbourne','Brisbane','Perth','Adelaide','Canberra','Gold Coast','Hobart','Darwin','Newcastle','Wollongong','Geelong'] },
+  'Fiji':         { flag:'🇫🇯', capital:'Suva',          pop:'0.9M',  area:'18,274 km²',    currency:'Fijian Dollar',           lang:'English, Fijian, Hindi',       cities:['Suva','Lautoka','Nadi','Labasa','Ba','Sigatoka'] },
+  'New Zealand':  { flag:'🇳🇿', capital:'Wellington',    pop:'5.1M',  area:'268,021 km²',   currency:'New Zealand Dollar',      lang:'English, Māori',               cities:['Auckland','Wellington','Christchurch','Hamilton','Tauranga','Dunedin','Palmerston North','Napier'] },
+  'Papua New Guinea':{ flag:'🇵🇬', capital:'Port Moresby', pop:'10.3M', area:'462,840 km²', currency:'Kina',                   lang:'Tok Pisin, English, Hiri Motu',cities:['Port Moresby','Lae','Arawa','Mount Hagen','Madang','Wewak','Goroka'] },
+  'Samoa':        { flag:'🇼🇸', capital:'Apia',          pop:'0.2M',  area:'2,842 km²',     currency:'Samoan Tālā',             lang:'Samoan, English',              cities:['Apia','Asau','Mulifanua','Faleolo','Safotulafai'] },
+  'Solomon Islands':{ flag:'🇸🇧', capital:'Honiara',     pop:'0.7M',  area:'28,896 km²',    currency:'Solomon Islands Dollar',  lang:'English',                      cities:['Honiara','Auki','Gizo','Buala','Kirakira'] },
+  'Tonga':        { flag:'🇹🇴', capital:"Nuku'alofa",    pop:'0.1M',  area:'747 km²',       currency:'Tongan Paʻanga',          lang:'Tongan, English',              cities:["Nuku'alofa",'Neiafu','Haveluloto','Vaini','Tofoa-Koloua'] },
+  'Vanuatu':      { flag:'🇻🇺', capital:'Port Vila',     pop:'0.3M',  area:'12,189 km²',    currency:'Vanuatu Vatu',            lang:'Bislama, English, French',     cities:['Port Vila','Luganville','Isangel','Sola','Lakatoro'] },
+};
+
+let lastSent = '';
+let currentContinent = '';
+let currentCountry = '';
+
+function sendPlace(name) {
+  if (name === lastSent) return;
+  lastSent = name;
+  fetch(DB_URL, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(name) }).catch(()=>{});
+}
+
+const popup   = document.getElementById('info-popup');
+const popName = document.getElementById('popup-name');
+const popType = document.getElementById('popup-type');
+const popRows = document.getElementById('popup-rows');
+
+function placePopup(x, y) {
+  const ph = popup.offsetHeight || 200;
+  let left = x + 16, top = y + 14;
+  if (left + 290 > window.innerWidth  - 8) left = x - 306;
+  if (top  + ph  > window.innerHeight - 8) top  = y - ph - 6;
+  popup.style.left = left + 'px';
+  popup.style.top  = top  + 'px';
+}
+function showPopup(name, type, rows, x, y) {
+  popName.textContent = name;
+  popType.textContent = type;
+  popRows.innerHTML = rows.map(([k,v]) => `<div class="popup-row"><span class="popup-row-key">${k}</span><span class="popup-row-val">${v}</span></div>`).join('');
+  popup.style.display = 'block';
+  placePopup(x, y);
+}
+function hidePopup() { popup.style.display = 'none'; }
+
+document.querySelectorAll('.cont-tab').forEach(btn =>
+  btn.addEventListener('click', () => showContinent(btn.dataset.continent))
+);
+
+function showContinent(name) {
+  currentContinent = name;
+  currentCountry = '';
+  document.querySelectorAll('.cont-tab').forEach(b => b.classList.toggle('active', b.dataset.continent === name));
+  document.getElementById('bc-sep2').style.display = '';
+  document.getElementById('bc-continent').textContent = name;
+  document.getElementById('bc-sep3').style.display = 'none';
+  document.getElementById('bc-country').textContent = '';
+
+  const countries = CONTINENTS[name] || [];
+  document.getElementById('country-count').textContent = countries.length;
+
+  const list = document.getElementById('country-list');
+  list.innerHTML = '';
+  countries.forEach(c => {
+    const d = COUNTRY_DATA[c];
+    const li = document.createElement('li');
+    li.className = 'country-item';
+    li.innerHTML = `<span class="country-flag">${d ? d.flag : '🏳'}</span>${c}<span class="country-city-count">${d ? d.cities.length : ''}</span>`;
+    li.addEventListener('click', () => showCountry(c));
+    li.addEventListener('mouseenter', (e) => {
+      sendPlace(c);
+      if (!d) return;
+      showPopup(c, `Country · ${name}`, [['Capital',d.capital],['Population',d.pop],['Area',d.area],['Currency',d.currency],['Language(s)',d.lang]], e.clientX, e.clientY);
+    });
+    li.addEventListener('mousemove', (e) => { if (popup.style.display === 'block') placePopup(e.clientX, e.clientY); });
+    li.addEventListener('mouseleave', hidePopup);
+    list.appendChild(li);
+  });
+
+  resetCityPanel();
+}
+
+function resetCityPanel() {
+  document.getElementById('country-name-display').textContent = 'Select a country';
+  document.getElementById('country-continent-display').textContent = '';
+  document.getElementById('country-facts').innerHTML = '';
+  document.getElementById('city-grid').innerHTML = `<div id="empty-state"><span class="arrow-hint">←</span>Click a country on the left to browse its cities.</div>`;
+}
+
+function showCountry(name) {
+  currentCountry = name;
+  const d = COUNTRY_DATA[name];
+  if (!d) return;
+
+  document.querySelectorAll('.country-item').forEach(li => {
+    li.classList.toggle('active', li.textContent.includes(name) && li.textContent.startsWith(d.flag));
+  });
+  document.getElementById('bc-sep3').style.display = '';
+  document.getElementById('bc-country').textContent = name;
+  document.getElementById('country-name-display').textContent = `${d.flag}  ${name}`;
+  document.getElementById('country-continent-display').textContent = currentContinent;
+  document.getElementById('country-facts').innerHTML = `
+    <div class="fact-block"><span class="fact-label">Capital</span><span class="fact-value">${d.capital}</span></div>
+    <div class="fact-block"><span class="fact-label">Population</span><span class="fact-value">${d.pop}</span></div>
+    <div class="fact-block"><span class="fact-label">Area</span><span class="fact-value">${d.area}</span></div>
+    <div class="fact-block"><span class="fact-label">Currency</span><span class="fact-value">${d.currency}</span></div>
+  `;
+
+  const grid = document.getElementById('city-grid');
+  grid.innerHTML = '';
+  d.cities.forEach(city => {
+    const btn = document.createElement('button');
+    btn.className = 'city-btn';
+    btn.textContent = city;
+    btn.addEventListener('mouseenter', (e) => {
+      sendPlace(`${city}, ${name}`);
+      showPopup(city, `City · ${name} · ${currentContinent}`, [['Country',name],['Continent',currentContinent],['Capital of',d.capital===city?name:'—']], e.clientX, e.clientY);
+    });
+    btn.addEventListener('mousemove', (e) => { if (popup.style.display === 'block') placePopup(e.clientX, e.clientY); });
+    btn.addEventListener('mouseleave', hidePopup);
+    grid.appendChild(btn);
+  });
+}
+
+const searchInput = document.getElementById('search-input');
+const searchBtn   = document.getElementById('search-btn');
+
+function doSearch() {
+  const q = searchInput.value.trim();
+  if (!q) return;
+  const ql = q.toLowerCase();
+  const countryMatch = Object.keys(COUNTRY_DATA).find(c => c.toLowerCase() === ql);
+  if (countryMatch) {
+    const cont = Object.keys(CONTINENTS).find(k => CONTINENTS[k].includes(countryMatch));
+    if (cont) { showContinent(cont); showCountry(countryMatch); return; }
+  }
+  for (const [country, data] of Object.entries(COUNTRY_DATA)) {
+    const cityMatch = data.cities.find(city => city.toLowerCase() === ql);
+    if (cityMatch) {
+      const cont = Object.keys(CONTINENTS).find(k => CONTINENTS[k].includes(country));
+      if (cont) {
+        showContinent(cont); showCountry(country);
+        setTimeout(() => {
+          document.querySelectorAll('.city-btn').forEach(btn => {
+            if (btn.textContent.toLowerCase() === ql) {
+              btn.scrollIntoView({ block:'center', behavior:'smooth' });
+              btn.style.background = '#d0eefa';
+              setTimeout(() => { btn.style.background = ''; }, 1800);
+            }
+          });
+        }, 50);
+        return;
+      }
+    }
+  }
+  const partial = Object.keys(COUNTRY_DATA).find(c => c.toLowerCase().includes(ql));
+  if (partial) { const cont = Object.keys(CONTINENTS).find(k => CONTINENTS[k].includes(partial)); if (cont) { showContinent(cont); showCountry(partial); } }
+}
+
+searchBtn.addEventListener('click', doSearch);
+searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+showContinent('Europe');
+</script>
+</body>
+</html>
