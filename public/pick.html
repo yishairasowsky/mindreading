@@ -430,7 +430,107 @@
         }
     });
 
+    // ---- Voice recognition (silent force) ----
+    function startVoiceListener() {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) return;
+
+        const recognition = new SR();
+        recognition.continuous = true;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+        recognition.maxAlternatives = 3;
+
+        // Map spoken number words to digits
+        const ones = {one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,
+            eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,
+            eighteen:18,nineteen:19};
+        const tens = {twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
+
+        function parseSpokenNumber(text) {
+            // Normalize
+            text = text.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+
+            // Try direct digit match first (e.g. "47")
+            const digitMatch = text.match(/\b(\d{1,3})\b/g);
+            if (digitMatch) {
+                for (const m of digitMatch) {
+                    const n = parseInt(m, 10);
+                    if (n >= 1 && n <= 100) return n;
+                }
+            }
+
+            // "hundred" or "one hundred" or "a hundred"
+            if (/\bhundred\b/.test(text)) return 100;
+
+            // Try word-based parsing
+            const words = text.split(/\s+/);
+            for (let i = 0; i < words.length; i++) {
+                const w = words[i];
+                // Single word: "one" through "nineteen"
+                if (ones[w]) {
+                    return ones[w];
+                }
+                // Tens: "twenty" through "ninety", optionally followed by ones
+                if (tens[w]) {
+                    const next = words[i + 1];
+                    if (next && ones[next] && ones[next] <= 9) {
+                        return tens[w] + ones[next];
+                    }
+                    return tens[w];
+                }
+                // Hyphenated: "forty-seven"
+                if (w.includes('-')) {
+                    const parts = w.split('-');
+                    if (tens[parts[0]] && ones[parts[1]]) {
+                        return tens[parts[0]] + ones[parts[1]];
+                    }
+                }
+            }
+            return null;
+        }
+
+        let lastForceTime = 0;
+
+        recognition.onresult = (event) => {
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const result = event.results[i];
+                if (!result.isFinal) continue;
+                // Check all alternatives
+                for (let j = 0; j < result.length; j++) {
+                    const transcript = result[j].transcript;
+                    const num = parseSpokenNumber(transcript);
+                    if (num !== null && num >= 1 && num <= 100) {
+                        // Debounce: ignore if we just placed within 3 seconds
+                        const now = Date.now();
+                        if (now - lastForceTime > 3000) {
+                            lastForceTime = now;
+                            placeForceAt(num);
+                        }
+                        return;
+                    }
+                }
+            }
+        };
+
+        recognition.onend = () => {
+            // Auto-restart to keep listening
+            try { recognition.start(); } catch(e) {}
+        };
+
+        recognition.onerror = (e) => {
+            if (e.error === 'not-allowed' || e.error === 'service-not-available') return;
+            // Restart on transient errors
+            setTimeout(() => {
+                try { recognition.start(); } catch(e) {}
+            }, 1000);
+        };
+
+        try { recognition.start(); } catch(e) {}
+    }
+
     init();
+    startVoiceListener();
     </script>
 </body>
 </html>
