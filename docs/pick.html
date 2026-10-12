@@ -305,12 +305,14 @@
     let forceItem = null;
     let category = 'cities';
 
+    const PICK_CONFIG_URL = 'https://global-search-stats-default-rtdb.firebaseio.com/pickConfig.json';
+
     async function init() {
         try {
-            const res = await fetch('/api/pick/config');
+            const res = await fetch(PICK_CONFIG_URL);
             const config = await res.json();
-            category = config.category || 'cities';
-            forceItem = config.forceItem || DATA[category].items[0];
+            category = (config && config.category) || 'cities';
+            forceItem = (config && config.forceItem) || DATA[category].items[0];
         } catch(e) {
             category = 'cities';
             forceItem = 'Paris';

@@ -8,17 +8,17 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'docs')));
 
 // --- Number Force (pick) config ---
 let pickConfig = { category: 'cities', forceItem: 'Paris' };
 
 app.get('/pick', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'pick.html'));
+  res.sendFile(path.join(__dirname, 'docs', 'pick.html'));
 });
 
 app.get('/pick/backstage', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'pick-backstage.html'));
+  res.sendFile(path.join(__dirname, 'docs', 'pick-backstage.html'));
 });
 
 app.get('/api/pick/config', (req, res) => {
@@ -36,33 +36,33 @@ app.post('/api/pick/config', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'spectator.html'));
+  res.sendFile(path.join(__dirname, 'docs', 'spectator.html'));
 });
 
 app.get('/spectator', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'spectator.html'));
+  res.sendFile(path.join(__dirname, 'docs', 'spectator.html'));
 });
 
 app.get('/performer', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'performer.html'));
+  res.sendFile(path.join(__dirname, 'docs', 'performer.html'));
 });
 
 app.get('/backstage', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'performer.html'));
+  res.sendFile(path.join(__dirname, 'docs', 'performer.html'));
 });
 
 app.get('/atlas', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'atlas.html'));
+  res.sendFile(path.join(__dirname, 'docs', 'atlas.html'));
 });
 
 // Classic two-panel version (click to select country, then browse cities)
 app.get('/atlas-classic', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'atlas-classic.html'));
+  res.sendFile(path.join(__dirname, 'docs', 'atlas-classic.html'));
 });
 
 // Interactive map version (hover city dots on a real world map)
 app.get('/atlas-map', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'atlas-map.html'));
+  res.sendFile(path.join(__dirname, 'docs', 'atlas-map.html'));
 });
 
 io.on('connection', (socket) => {

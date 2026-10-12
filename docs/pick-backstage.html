@@ -299,6 +299,8 @@
         populateItems(forceSearch.value);
     });
 
+    const PICK_CONFIG_URL = 'https://global-search-stats-default-rtdb.firebaseio.com/pickConfig.json';
+
     saveBtn.addEventListener('click', async () => {
         const category = categorySelect.value;
         const forceItem = forceItemSelect.value;
@@ -308,8 +310,8 @@
             return;
         }
         try {
-            const res = await fetch('/api/pick/config', {
-                method: 'POST',
+            const res = await fetch(PICK_CONFIG_URL, {
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ category, forceItem })
             });
@@ -326,14 +328,17 @@
 
     async function loadCurrentConfig() {
         try {
-            const res = await fetch('/api/pick/config');
+            const res = await fetch(PICK_CONFIG_URL);
             const config = await res.json();
+            if (!config) {
+                configEl.textContent = 'No config set yet — choose and save above';
+                return;
+            }
             configEl.innerHTML = `
                 <strong>Current Config</strong><br>
                 Category: <strong>${config.category}</strong><br>
                 Force Item: <strong>${config.forceItem}</strong>
             `;
-            // Set dropdowns to current config
             categorySelect.value = config.category;
             populateItems();
             forceItemSelect.value = config.forceItem;
