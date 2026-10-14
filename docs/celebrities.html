@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The 100 Most Influential People of All Time | Epoch Magazine</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #c0152a;
+    --dark: #111111;
+    --mid: #2a2a2a;
+    --ink: #1a1a1a;
+    --muted: #555;
+    --light: #f6f4f0;
+    --border: #ddd;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--light);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── Top utility bar ── */
+  #top-bar {
+    background: var(--dark);
+    color: #aaa;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    padding: 6px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-transform: uppercase;
+  }
+  #top-bar a { color: #888; text-decoration: none; margin: 0 8px; }
+  #top-bar a:hover { color: #fff; }
+  #top-bar .sep { color: #444; }
+
+  /* ── Masthead ── */
+  #masthead {
+    background: var(--dark);
+    border-bottom: 3px solid var(--red);
+    padding: 18px 28px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  #logo {
+    font-family: var(--serif);
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -1px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  #logo span { color: var(--red); }
+  #tagline {
+    font-size: 11px;
+    color: #777;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+  #search-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  #search-bar input {
+    padding: 7px 14px;
+    font-size: 13px;
+    border: none;
+    border-radius: 2px 0 0 2px;
+    outline: none;
+    width: 210px;
+    background: #222;
+    color: #eee;
+  }
+  #search-bar input::placeholder { color: #666; }
+  #search-bar button {
+    background: var(--red);
+    border: none;
+    color: #fff;
+    padding: 7px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 0 2px 2px 0;
+    font-weight: 600;
+  }
+  #search-bar button:hover { background: #a01020; }
+
+  /* ── Nav ── */
+  #nav {
+    background: var(--mid);
+    border-bottom: 1px solid #3a3a3a;
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+  }
+  .nav-link {
+    color: #bbb;
+    text-decoration: none;
+    font-size: 12.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 11px 16px;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: color 0.15s;
+    font-weight: 500;
+  }
+  .nav-link:hover { color: #fff; }
+  .nav-link.active {
+    color: #fff;
+    border-bottom-color: var(--red);
+  }
+
+  /* ── Hero banner ── */
+  #hero {
+    background: var(--dark);
+    color: #fff;
+    padding: 42px 28px 38px;
+    text-align: center;
+    border-bottom: 1px solid #2a2a2a;
+    position: relative;
+    overflow: hidden;
+  }
+  #hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, #2a1a1a 0%, #111 70%);
+    z-index: 0;
+  }
+  #hero > * { position: relative; z-index: 1; }
+  #hero .kicker {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--red);
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  #hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  #hero .byline {
+    font-size: 13px;
+    color: #999;
+    letter-spacing: 0.05em;
+  }
+  #hero .byline strong { color: #ccc; }
+  #hero .lead {
+    max-width: 620px;
+    margin: 16px auto 0;
+    font-size: 16px;
+    color: #bbb;
+    line-height: 1.7;
+    font-family: var(--serif);
+    font-style: italic;
+  }
+
+  /* ── Page layout ── */
+  #page-wrap {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+  }
+
+  /* ── Main content ── */
+  #main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* ── Intro copy ── */
+  .article-intro {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--red);
+    padding: 18px 22px;
+    margin-bottom: 26px;
+    font-family: var(--serif);
+    font-size: 15.5px;
+    color: #333;
+    line-height: 1.75;
+  }
+
+  /* ── Category section ── */
+  .category-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    margin-bottom: 22px;
+    overflow: hidden;
+  }
+  .category-header {
+    background: var(--dark);
+    color: #fff;
+    padding: 11px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .category-header h2 {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .category-header .count {
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .celebrity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0;
+    padding: 8px 0;
+  }
+  .celeb-name {
+    display: block;
+    padding: 8px 20px;
+    font-size: 14px;
+    color: #1a4a8a;
+    cursor: pointer;
+    border-bottom: 1px solid #f2f0ed;
+    transition: background 0.12s;
+    font-weight: 500;
+    position: relative;
+  }
+  .celeb-name:hover {
+    background: #f0eae8;
+    color: #c0152a;
+    text-decoration: underline;
+  }
+  .celeb-num {
+    font-size: 11px;
+    color: #bbb;
+    margin-right: 5px;
+    font-style: normal;
+    font-family: var(--sans);
+    font-weight: 400;
+  }
+
+  /* ── Bio Popup ── */
+  #bio-popup {
+    position: fixed;
+    z-index: 9999;
+    pointer-events: none;
+    width: 300px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-top: 4px solid var(--red);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+    padding: 16px 18px 18px;
+    display: none;
+    font-family: var(--sans);
+  }
+  #popup-name {
+    font-family: var(--serif);
+    font-size: 17px;
+    color: var(--dark);
+    font-weight: 700;
+    margin-bottom: 2px;
+    line-height: 1.2;
+  }
+  #popup-dates {
+    font-size: 11px;
+    color: #999;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  #popup-bio {
+    font-size: 13px;
+    color: #333;
+    line-height: 1.6;
+    font-family: var(--serif);
+  }
+  #popup-tag {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--red);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-family: var(--sans);
+    font-weight: 700;
+  }
+
+  /* ── Sidebar ── */
+  #sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .sidebar-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    padding: 16px 16px 18px;
+  }
+  .sidebar-card h3 {
+    font-family: var(--serif);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--dark);
+    border-bottom: 2px solid var(--red);
+    padding-bottom: 7px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .trending-list { list-style: none; }
+  .trending-list li {
+    padding: 6px 0;
+    border-bottom: 1px solid #f0eeea;
+    font-size: 13px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .trending-list li:last-child { border-bottom: none; }
+  .trending-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--red);
+    min-width: 16px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .trending-list a {
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .trending-list a:hover { color: var(--red); text-decoration: underline; }
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid #f0eeea;
+    font-size: 12.5px;
+    color: #444;
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-val { font-weight: 700; color: var(--dark); }
+  .pull-quote {
+    font-family: var(--serif);
+    font-size: 14px;
+    color: #333;
+    font-style: italic;
+    line-height: 1.65;
+    border-left: 3px solid var(--red);
+    padding-left: 12px;
+    margin-bottom: 10px;
+  }
+  .pull-attrib {
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-align: right;
+  }
+  .editors-pick {
+    display: block;
+    padding: 6px 0;
+    border-bottom: 1px solid #f0eeea;
+    font-size: 13px;
+    color: #1a4a8a;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .editors-pick:last-child { border-bottom: none; }
+  .editors-pick:hover { color: var(--red); }
+  .issue-badge {
+    background: var(--red);
+    color: #fff;
+    text-align: center;
+    padding: 14px 10px;
+    margin-bottom: 10px;
+  }
+  .issue-badge .issue-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-bottom: 4px;
+  }
+  .issue-badge .issue-title {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .issue-sub {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+  }
+
+  /* ── Footer ── */
+  #footer {
+    background: var(--dark);
+    color: #777;
+    padding: 16px 28px;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-top: 3px solid var(--red);
+  }
+  #footer a { color: #666; text-decoration: none; margin: 0 8px; }
+  #footer a:hover { color: #ccc; }
+
+  @media (max-width: 820px) {
+    #sidebar { display: none; }
+    .celebrity-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    #masthead { flex-direction: column; gap: 12px; }
+  }
+  @media (max-width: 500px) {
+    .celebrity-grid { grid-template-columns: 1fr 1fr; }
+    #top-bar .right-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top utility bar -->
+<div id="top-bar">
+  <div>
+    <a href="#">Subscribe</a><span class="sep"> | </span>
+    <a href="#">Sign In</a><span class="sep"> | </span>
+    <a href="#">Newsletter</a>
+  </div>
+  <div class="right-links">
+    <a href="#">Archive</a><span class="sep"> | </span>
+    <a href="#">About</a><span class="sep"> | </span>
+    <a href="#">Contact</a>
+  </div>
+</div>
+
+<!-- Masthead -->
+<div id="masthead">
+  <div>
+    <a id="logo" href="#">EPOCH<span>.</span></a>
+    <div id="tagline">Ideas &bull; Culture &bull; History</div>
+  </div>
+  <div id="search-bar">
+    <input type="text" placeholder="Search Epoch&hellip;" autocomplete="off">
+    <button>Search</button>
+  </div>
+</div>
+
+<!-- Nav -->
+<div id="nav">
+  <a class="nav-link" href="#">World</a>
+  <a class="nav-link" href="#">Politics</a>
+  <a class="nav-link active" href="#">Culture</a>
+  <a class="nav-link" href="#">Science</a>
+  <a class="nav-link" href="#">Business</a>
+  <a class="nav-link" href="#">History</a>
+  <a class="nav-link" href="#">Lists</a>
+  <a class="nav-link" href="#">Opinion</a>
+</div>
+
+<!-- Hero -->
+<div id="hero">
+  <div class="kicker">Special Edition &bull; The Definitive List</div>
+  <h1>The 100 Most Influential People of All Time</h1>
+  <div class="byline">By <strong>The Editors of Epoch Magazine</strong> &bull; Updated March 2025</div>
+  <div class="lead">Across science, art, politics, and sport — the men and women whose ideas, deeds, and legacies permanently altered the course of human history.</div>
+</div>
+
+<!-- Page wrap -->
+<div id="page-wrap">
+
+  <!-- Main content -->
+  <div id="main">
+
+    <div class="article-intro">
+      Who truly shapes the world? Our editorial board spent six months consulting historians, sociologists, and cultural critics to produce the most rigorous ranking of human influence ever assembled. Hover any name to read a brief profile. The list spans three millennia and every corner of the globe.
+    </div>
+
+    <!-- Categories injected by JS -->
+    <div id="categories-container"></div>
+
+  </div>
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+
+    <div class="sidebar-card">
+      <div class="issue-badge">
+        <div class="issue-label">Special Issue</div>
+        <div class="issue-title">The 100 Most Influential of All Time</div>
+      </div>
+      <div class="issue-sub">A landmark ranking from our editors, five years in the making. Available in print and digital editions.</div>
+    </div>
+
+    <div class="sidebar-card">
+      <h3>Trending Now</h3>
+      <ul class="trending-list">
+        <li><span class="trending-num">1</span><a href="#">Marie Curie's Lost Notebooks</a></li>
+        <li><span class="trending-num">2</span><a href="#">The Einstein Letters</a></li>
+        <li><span class="trending-num">3</span><a href="#">Shakespeare's Unknown Years</a></li>
+        <li><span class="trending-num">4</span><a href="#">Churchill's Private Diaries</a></li>
+        <li><span class="trending-num">5</span><a href="#">The Newton Manuscripts</a></li>
+        <li><span class="trending-num">6</span><a href="#">Cleopatra Reconsidered</a></li>
+        <li><span class="trending-num">7</span><a href="#">Was Tesla Robbed?</a></li>
+      </ul>
+    </div>
+
+    <div class="sidebar-card">
+      <h3>Editor's Picks</h3>
+      <a class="editors-pick" href="#">Why Darwin Still Matters</a>
+      <a class="editors-pick" href="#">The Forgotten Women of Science</a>
+      <a class="editors-pick" href="#">Lincoln's Greatest Speech</a>
+      <a class="editors-pick" href="#">Mozart at 30: A Reappraisal</a>
+      <a class="editors-pick" href="#">The Mandela Effect in Politics</a>
+    </div>
+
+    <div class="sidebar-card">
+      <h3>List Statistics</h3>
+      <div class="stat-row"><span>Total nominees</span><span class="stat-val">4,200</span></div>
+      <div class="stat-row"><span>Final selections</span><span class="stat-val">100</span></div>
+      <div class="stat-row"><span>Countries represented</span><span class="stat-val">32</span></div>
+      <div class="stat-row"><span>Centuries covered</span><span class="stat-val">30+</span></div>
+      <div class="stat-row"><span>Expert panelists</span><span class="stat-val">47</span></div>
+    </div>
+
+    <div class="sidebar-card">
+      <h3>Quote of the Issue</h3>
+      <div class="pull-quote">"The measure of a life is not its duration, but its donation."</div>
+      <div class="pull-attrib">&mdash; Peter Marshall</div>
+    </div>
+
+  </div>
+
+</div><!-- /page-wrap -->
+
+<!-- Bio popup -->
+<div id="bio-popup">
+  <div id="popup-name"></div>
+  <div id="popup-dates"></div>
+  <div id="popup-bio"></div>
+  <span id="popup-tag"></span>
+</div>
+
+<!-- Footer -->
+<div id="footer">
+  <span>&copy; 2025 Epoch Magazine. All rights reserved.</span>
+  <div>
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Cookies</a>
+    <a href="#">Accessibility</a>
+    <a href="#">Advertise</a>
+  </div>
+</div>
+
+<script>
+const DB_URL = 'https://global-search-stats-default-rtdb.firebaseio.com/chosenCelebrity.json';
+let lastSent = '';
+
+function sendCelebrity(name) {
+  if (name === lastSent) return;
+  lastSent = name;
+  fetch(DB_URL, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(name)
+  }).catch(() => {});
+}
+
+// ── Celebrity data ──────────────────────────────────────────────────────────
+const CATEGORIES = [
+  {
+    name: 'Political Leaders & Revolutionaries',
+    people: [
+      { name: 'Napoleon Bonaparte',   dates: '1769–1821', tag: 'Military Leader',  bio: 'French emperor who reshaped Europe through conquest and legal reform. The Napoleonic Code he instituted still underpins the law of dozens of nations.' },
+      { name: 'Abraham Lincoln',       dates: '1809–1865', tag: 'President',        bio: 'The 16th U.S. president steered the nation through its bloodiest war and signed the Emancipation Proclamation, ending the institution of slavery.' },
+      { name: 'Julius Caesar',         dates: '100–44 BC', tag: 'Roman Statesman',  bio: 'General and statesman whose military genius and political ambition transformed the Roman Republic into an empire that dominated the Western world.' },
+      { name: 'Genghis Khan',          dates: '1162–1227', tag: 'Conqueror',        bio: 'Founded the largest contiguous land empire in history, connecting East and West through the Pax Mongolica and enabling unprecedented trade and cultural exchange.' },
+      { name: 'Queen Elizabeth I',     dates: '1533–1603', tag: 'Monarch',          bio: 'Her 44-year reign ushered in the English Renaissance, the defeat of the Spanish Armada, and the beginning of England\'s maritime dominance.' },
+      { name: 'Winston Churchill',     dates: '1874–1965', tag: 'Prime Minister',   bio: 'His wartime leadership and stirring oratory rallied Britain against Nazi Germany when capitulation seemed the only alternative.' },
+      { name: 'Mahatma Gandhi',        dates: '1869–1948', tag: 'Independence Leader', bio: 'Pioneered nonviolent civil disobedience to win India\'s independence, inspiring liberation movements on every continent.' },
+      { name: 'Nelson Mandela',        dates: '1918–2013', tag: 'President',        bio: 'Imprisoned for 27 years, he emerged to lead South Africa\'s transition from apartheid, becoming a global symbol of reconciliation and justice.' },
+      { name: 'Cleopatra VII',         dates: '69–30 BC',  tag: 'Pharaoh',          bio: 'Last active ruler of the Ptolemaic Kingdom of Egypt; her alliances with Caesar and Antony made her one of antiquity\'s most consequential diplomats.' },
+      { name: 'Mao Zedong',            dates: '1893–1976', tag: 'Chairman',         bio: 'Founder of the People\'s Republic of China, whose radical social and economic programs transformed the world\'s most populous nation.' },
+      { name: 'Catherine the Great',   dates: '1729–1796', tag: 'Empress',          bio: 'Longest-ruling female leader of Russia; modernised the empire along Enlightenment principles and expanded its territory dramatically.' },
+    ]
+  },
+  {
+    name: 'Scientists & Inventors',
+    people: [
+      { name: 'Isaac Newton',          dates: '1643–1727', tag: 'Physicist',        bio: 'Formulated the laws of motion and universal gravitation, and co-invented calculus — establishing the framework of classical mechanics still taught today.' },
+      { name: 'Albert Einstein',       dates: '1879–1955', tag: 'Physicist',        bio: 'His theories of special and general relativity overturned Newtonian physics and introduced the famous equation E=mc², reshaping our understanding of space, time, and energy.' },
+      { name: 'Marie Curie',           dates: '1867–1934', tag: 'Chemist',          bio: 'First person to win Nobel Prizes in two different sciences. Her pioneering research on radioactivity laid the groundwork for modern nuclear medicine.' },
+      { name: 'Charles Darwin',        dates: '1809–1882', tag: 'Naturalist',       bio: 'His theory of evolution by natural selection, published in On the Origin of Species, fundamentally altered humanity\'s understanding of life on Earth.' },
+      { name: 'Nikola Tesla',          dates: '1856–1943', tag: 'Inventor',         bio: 'His development of alternating current electrical systems powers the modern world. Visionary patents in radio, robotics, and energy transfer were decades ahead of their time.' },
+      { name: 'Galileo Galilei',       dates: '1564–1642', tag: 'Astronomer',       bio: 'Championed heliocentrism and laid the foundations of modern observational astronomy and experimental physics, at great personal cost.' },
+      { name: 'Stephen Hawking',       dates: '1942–2018', tag: 'Cosmologist',      bio: 'Theoretical work on black holes and cosmology transformed physics; his bestselling books brought deep science to a global popular audience.' },
+      { name: 'Leonardo da Vinci',     dates: '1452–1519', tag: 'Polymath',         bio: 'Painter, sculptor, architect, engineer, and anatomist — the embodiment of Renaissance genius whose notebooks still reveal breathtaking scientific foresight.' },
+      { name: 'Alan Turing',           dates: '1912–1954', tag: 'Mathematician',    bio: 'Father of theoretical computer science and artificial intelligence. His work breaking the Enigma code shortened World War II by an estimated two years.' },
+      { name: 'Thomas Edison',         dates: '1847–1931', tag: 'Inventor',         bio: 'Holder of 1,093 U.S. patents, including the phonograph and practical incandescent light bulb. His Menlo Park laboratory invented the concept of industrial research.' },
+      { name: 'Louis Pasteur',         dates: '1822–1895', tag: 'Microbiologist',   bio: 'Germ theory, pasteurisation, and vaccines for rabies and anthrax — Pasteur\'s discoveries saved more lives than those of any other individual in history.' },
+    ]
+  },
+  {
+    name: 'Artists, Writers & Philosophers',
+    people: [
+      { name: 'William Shakespeare',   dates: '1564–1616', tag: 'Playwright',       bio: 'Author of 37 plays and 154 sonnets; his works explore the full range of human experience and have been performed and translated more than any other writer\'s.' },
+      { name: 'Michelangelo',          dates: '1475–1564', tag: 'Artist',           bio: 'The Sistine Chapel ceiling, the Pietà, and the statue of David represent the apex of Renaissance art — works that defined Western aesthetics for centuries.' },
+      { name: 'Ludwig van Beethoven',  dates: '1770–1827', tag: 'Composer',         bio: 'Composed nine symphonies, five piano concertos, and some of the most celebrated chamber music ever written — largely while profoundly deaf.' },
+      { name: 'Aristotle',             dates: '384–322 BC',tag: 'Philosopher',      bio: 'His encyclopedic writings on logic, biology, ethics, politics, and aesthetics formed the intellectual bedrock of Western and Islamic civilisation for 1,500 years.' },
+      { name: 'Plato',                 dates: '428–348 BC',tag: 'Philosopher',      bio: 'Founded the Academy in Athens and authored the dialogues that shaped Western philosophy, political theory, and the concept of idealism.' },
+      { name: 'Homer',                 dates: 'c. 800 BC', tag: 'Poet',             bio: 'The Iliad and the Odyssey are the foundational texts of Western literature, shaping narrative tradition, heroic ethics, and cultural identity across millennia.' },
+      { name: 'Dante Alighieri',       dates: '1265–1321', tag: 'Poet',             bio: 'The Divine Comedy stands as the supreme work of Italian literature and a cornerstone of Western civilisation, mapping morality, theology, and the human soul.' },
+      { name: 'Pablo Picasso',         dates: '1881–1973', tag: 'Painter',          bio: 'Co-founder of Cubism; his prolific output across painting, sculpture, and ceramics permanently altered what art could say and how it could say it.' },
+      { name: 'Fyodor Dostoevsky',     dates: '1821–1881', tag: 'Novelist',         bio: 'Crime and Punishment, The Idiot, and The Brothers Karamazov probed the psychology of guilt and redemption with an intensity never surpassed in fiction.' },
+      { name: 'Johann Sebastian Bach', dates: '1685–1750', tag: 'Composer',         bio: 'The Well-Tempered Clavier, the Mass in B minor, and the Brandenburg Concertos synthesised Baroque music into an architecture of sublime mathematical beauty.' },
+    ]
+  },
+  {
+    name: 'Explorers & Pioneers',
+    people: [
+      { name: 'Christopher Columbus',  dates: '1451–1506', tag: 'Explorer',         bio: 'His 1492 voyage permanently linked the Old and New Worlds, triggering an era of European colonisation that reshaped every continent on Earth.' },
+      { name: 'Neil Armstrong',        dates: '1930–2012', tag: 'Astronaut',        bio: 'Commander of Apollo 11 and the first human to set foot on the Moon — a feat watched live by 600 million people and hailed as mankind\'s greatest achievement.' },
+      { name: 'Amelia Earhart',        dates: '1897–1937', tag: 'Aviator',          bio: 'First woman to fly solo across the Atlantic. Her daring flights and advocacy shattered assumptions about women\'s capabilities in aviation and beyond.' },
+      { name: 'Marco Polo',            dates: '1254–1324', tag: 'Traveller',        bio: 'His accounts of a 24-year journey through Asia introduced Europeans to the Silk Road, Chinese civilisation, and the riches of the East.' },
+      { name: 'Ferdinand Magellan',    dates: '1480–1521', tag: 'Navigator',        bio: 'Led the first expedition to circumnavigate the Earth, proving that the planet\'s oceans are connected and establishing the true scale of the globe.' },
+    ]
+  },
+  {
+    name: 'Athletes & Sports Icons',
+    people: [
+      { name: 'Muhammad Ali',          dates: '1942–2016', tag: 'Boxer',            bio: 'Three-time heavyweight champion and recipient of the Presidential Medal of Freedom. Both inside and outside the ring, he was the most recognisable athlete who ever lived.' },
+      { name: 'Michael Jordan',        dates: 'b. 1963',   tag: 'Basketball',       bio: 'Six NBA championships, five MVP awards, and a global brand that transcended sport. Jordan redefined what an athlete could mean to popular culture.' },
+      { name: 'Pelé',                  dates: '1940–2022', tag: 'Football',         bio: 'The only player to win three FIFA World Cups, scoring 1,283 goals in his career. His artistry and joy embodied football\'s universal appeal.' },
+      { name: 'Serena Williams',       dates: 'b. 1981',   tag: 'Tennis',           bio: '23 Grand Slam singles titles, the most by any player in the Open Era. Transformed women\'s tennis with her power, longevity, and unapologetic presence.' },
+      { name: 'Usain Bolt',            dates: 'b. 1986',   tag: 'Athletics',        bio: 'Eight Olympic gold medals and world records in the 100m and 200m. No human in recorded history has run faster.' },
+      { name: 'Simone Biles',          dates: 'b. 1997',   tag: 'Gymnastics',       bio: 'The most decorated gymnast in history, with multiple skills named after her. Her courage in speaking out about mental health changed the conversation in elite sport.' },
+      { name: 'Jesse Owens',           dates: '1913–1980', tag: 'Athletics',        bio: 'Won four gold medals at the 1936 Berlin Olympics, directly refuting Nazi ideology on the world stage in one of sport\'s most powerful political statements.' },
+      { name: 'Roger Federer',         dates: 'b. 1981',   tag: 'Tennis',           bio: 'Twenty Grand Slam titles and a playing style of such elegance and precision that he is widely considered the most aesthetically gifted athlete of the modern era.' },
+      { name: 'Michael Phelps',        dates: 'b. 1985',   tag: 'Swimming',         bio: 'Twenty-three Olympic gold medals, the most of any individual competitor in Olympic history. His dominance across five Games is statistically unmatched.' },
+    ]
+  },
+  {
+    name: 'Business & Technology Visionaries',
+    people: [
+      { name: 'Steve Jobs',            dates: '1955–2011', tag: 'Entrepreneur',     bio: 'Co-founder of Apple Inc. and the driving force behind the Macintosh, iPod, iPhone, and iPad — products that redefined personal computing, music, and communication.' },
+      { name: 'Bill Gates',            dates: 'b. 1955',   tag: 'Entrepreneur',     bio: 'Co-founder of Microsoft and architect of the personal computer revolution. His philanthropy through the Gates Foundation has addressed global health crises on an unprecedented scale.' },
+      { name: 'Henry Ford',            dates: '1863–1947', tag: 'Industrialist',    bio: 'His moving assembly line made the automobile affordable for ordinary families and established the template for modern mass production worldwide.' },
+      { name: 'John D. Rockefeller',   dates: '1839–1937', tag: 'Industrialist',    bio: 'Founded Standard Oil and became the wealthiest individual in modern history. His philanthropic legacy includes the University of Chicago and Rockefeller University.' },
+      { name: 'Elon Musk',             dates: 'b. 1971',   tag: 'Entrepreneur',     bio: 'Founded or co-founded Tesla, SpaceX, and PayPal. His ambition to electrify transport and make humanity multi-planetary has reshaped entire industries.' },
+      { name: 'Jeff Bezos',            dates: 'b. 1964',   tag: 'Entrepreneur',     bio: 'Founded Amazon and transformed retail, cloud computing, and logistics. AWS alone underpins much of the global internet.' },
+      { name: 'Warren Buffett',        dates: 'b. 1930',   tag: 'Investor',         bio: 'The most successful investor of the 20th century, building Berkshire Hathaway into a conglomerate worth over $900 billion. Pledged 99% of his wealth to philanthropy.' },
+    ]
+  },
+  {
+    name: 'Humanitarians & Social Reformers',
+    people: [
+      { name: 'Martin Luther King Jr.', dates: '1929–1968', tag: 'Civil Rights',   bio: 'His nonviolent campaigns and the "I Have a Dream" speech galvanised the American civil rights movement and secured landmark legislation against racial discrimination.' },
+      { name: 'Mother Teresa',          dates: '1910–1997', tag: 'Missionary',     bio: 'Founded the Missionaries of Charity in Calcutta and dedicated her life to serving the poorest of the poor. Canonised in 2016 and awarded the Nobel Peace Prize.' },
+      { name: 'Florence Nightingale',   dates: '1820–1910', tag: 'Nurse',          bio: 'Transformed nursing into a respected profession and pioneered the use of statistical graphics to advocate for sanitary reform. Her work saved thousands of soldiers\' lives.' },
+      { name: 'Frederick Douglass',     dates: '1818–1895', tag: 'Abolitionist',   bio: 'Born into slavery, he became the most prominent African American in 19th-century United States: orator, abolitionist, writer, and statesman.' },
+      { name: 'Rosa Parks',             dates: '1913–2005', tag: 'Activist',       bio: 'Her refusal to give up her bus seat in 1955 sparked the Montgomery Bus Boycott and is widely considered the birth of the modern American civil rights movement.' },
+      { name: 'Malala Yousafzai',       dates: 'b. 1997',   tag: 'Activist',       bio: 'Survived an assassination attempt by the Taliban and became the youngest Nobel Peace Prize laureate, advocating globally for girls\' access to education.' },
+      { name: 'Susan B. Anthony',       dates: '1820–1906', tag: 'Suffragist',     bio: 'Spent over five decades campaigning for women\'s suffrage in the United States. The 19th Amendment, ratified in 1920, is informally known as the Susan B. Anthony Amendment.' },
+    ]
+  },
+  {
+    name: 'Musicians & Entertainers',
+    people: [
+      { name: 'Elvis Presley',          dates: '1935–1977', tag: 'Musician',       bio: 'The "King of Rock and Roll" synthesised Black and white musical traditions into a phenomenon that changed popular culture permanently and sparked rock\'s global dominance.' },
+      { name: 'The Beatles',            dates: '1960–1970', tag: 'Band',           bio: 'John, Paul, George, and Ringo reshaped popular music, fashion, and youth culture. With over a billion records sold, they remain the best-selling music act in history.' },
+      { name: 'Michael Jackson',        dates: '1958–2009', tag: 'Musician',       bio: 'The "King of Pop" whose Thriller remains the best-selling album of all time. His dancing, music videos, and philanthropic work made him the most famous entertainer on Earth.' },
+      { name: 'Freddie Mercury',        dates: '1946–1991', tag: 'Musician',       bio: 'Lead singer of Queen whose four-octave vocal range and theatrical stage presence made him one of the greatest rock performers in history.' },
+      { name: 'Bob Dylan',              dates: 'b. 1941',   tag: 'Musician',       bio: 'Elevated popular song to literature, winning the Nobel Prize in Literature in 2016. His protest anthems defined a generation and shaped the singer-songwriter tradition.' },
+      { name: 'Beyoncé',                dates: 'b. 1981',   tag: 'Musician',       bio: '32 Grammy Awards — the most of any artist — and a cultural influence extending from music to fashion and social activism. Widely considered the defining female artist of the 21st century.' },
+      { name: 'Frank Sinatra',          dates: '1915–1998', tag: 'Musician',       bio: 'His phrasing and emotional depth transformed American popular song; "Ol\' Blue Eyes" remains the standard against which all crooners are measured.' },
+      { name: 'David Bowie',            dates: '1947–2016', tag: 'Musician',       bio: 'Through constant reinvention — from Ziggy Stardust to the Thin White Duke — Bowie pushed the boundaries of rock, art, and identity for five decades.' },
+    ]
+  },
+  {
+    name: 'Spiritual & Religious Figures',
+    people: [
+      { name: 'Jesus of Nazareth',      dates: 'c. 4 BC–AD 30', tag: 'Religious Figure', bio: 'Central figure of Christianity, the world\'s largest religion with 2.4 billion adherents. His teachings on love, forgiveness, and the dignity of persons have shaped ethics and culture globally.' },
+      { name: 'The Prophet Muhammad',   dates: '570–632',   tag: 'Religious Figure', bio: 'Founder of Islam, the world\'s second-largest religion. His revelations, compiled in the Quran, built an empire of faith spanning from Spain to Indonesia within a century of his death.' },
+      { name: 'Siddhartha Gautama',     dates: 'c. 563–483 BC', tag: 'Religious Figure', bio: 'The Buddha\'s teachings on the nature of suffering and the path to liberation founded Buddhism, which spread across Asia and now has over 500 million followers worldwide.' },
+      { name: 'Moses',                  dates: 'c. 13th C BC', tag: 'Religious Figure', bio: 'Prophet and lawgiver of Judaism whose story — and the Ten Commandments he delivered — forms the foundation of the three Abrahamic religions.' },
+      { name: 'Martin Luther',          dates: '1483–1546', tag: 'Reformer',       bio: 'His 95 Theses ignited the Protestant Reformation, fracturing the Catholic Church\'s monopoly over Western Christianity and reshaping European politics and culture forever.' },
+    ]
+  },
+  {
+    name: 'Architects, Designers & Innovators',
+    people: [
+      { name: 'Frank Lloyd Wright',     dates: '1867–1959', tag: 'Architect',      bio: 'Designed over 1,000 structures, including Fallingwater and the Guggenheim Museum. His organic architecture philosophy permanently influenced how buildings relate to landscape.' },
+      { name: 'Coco Chanel',            dates: '1883–1971', tag: 'Designer',       bio: 'Liberated women\'s fashion from corsets and introduced jersey knits, the little black dress, and Chanel No. 5 — shaping modern style for a century.' },
+      { name: 'Tim Berners-Lee',        dates: 'b. 1955',   tag: 'Inventor',       bio: 'Invented the World Wide Web in 1989 and gave it freely to the world, enabling an information revolution that transformed society, commerce, and politics.' },
+      { name: 'Guglielmo Marconi',      dates: '1874–1937', tag: 'Inventor',       bio: 'Developed practical wireless telegraphy and pioneered radio communication, winning the Nobel Prize in Physics and laying the groundwork for the age of broadcasting.' },
+      { name: 'Archimedes',             dates: 'c. 287–212 BC', tag: 'Mathematician', bio: 'Antiquity\'s greatest mathematician and engineer. He calculated pi, invented the Archimedes screw, and developed principles of levers and buoyancy still fundamental to engineering.' },
+    ]
+  }
+];
+
+// ── Build the page ───────────────────────────────────────────────────────────
+const popup   = document.getElementById('bio-popup');
+const popName = document.getElementById('popup-name');
+const popDate = document.getElementById('popup-dates');
+const popBio  = document.getElementById('popup-bio');
+const popTag  = document.getElementById('popup-tag');
+
+function placePopup(x, y) {
+  const ph = popup.offsetHeight || 180;
+  let left = x + 16, top = y + 14;
+  if (left + 300 > window.innerWidth  - 8) left = x - 316;
+  if (top  + ph  > window.innerHeight - 8) top  = y - ph - 6;
+  if (top < 4) top = 4;
+  popup.style.left = left + 'px';
+  popup.style.top  = top  + 'px';
+}
+
+function hidePopup() {
+  popup.style.display = 'none';
+}
+
+const container = document.getElementById('categories-container');
+let globalNum = 1;
+
+CATEGORIES.forEach(cat => {
+  const block = document.createElement('div');
+  block.className = 'category-block';
+
+  const header = document.createElement('div');
+  header.className = 'category-header';
+  header.innerHTML = `<h2>${cat.name}</h2><span class="count">${cat.people.length} profiles</span>`;
+  block.appendChild(header);
+
+  const grid = document.createElement('div');
+  grid.className = 'celebrity-grid';
+
+  cat.people.forEach(person => {
+    const span = document.createElement('span');
+    span.className = 'celeb-name';
+    span.innerHTML = `<span class="celeb-num">${globalNum++}.</span>${person.name}`;
+
+    span.addEventListener('mouseenter', (e) => {
+      sendCelebrity(person.name);
+      popName.textContent = person.name;
+      popDate.textContent = person.dates;
+      popBio.textContent  = person.bio;
+      popTag.textContent  = person.tag;
+      popup.style.display = 'block';
+      placePopup(e.clientX, e.clientY);
+    });
+
+    span.addEventListener('mousemove', (e) => {
+      if (popup.style.display === 'block') placePopup(e.clientX, e.clientY);
+    });
+
+    span.addEventListener('mouseleave', hidePopup);
+
+    grid.appendChild(span);
+  });
+
+  block.appendChild(grid);
+  container.appendChild(block);
+});
+</script>
+</body>
+</html>

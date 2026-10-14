@@ -57,6 +57,16 @@
       border-color: #0eb8e8;
       color: #0eb8e8;
     }
+    .ch-btn.active.celebrity {
+      background: #2a1a1a;
+      border-color: #e84040;
+      color: #e84040;
+    }
+    .ch-btn.active.random {
+      background: #2a2a1a;
+      border-color: #e8b830;
+      color: #e8b830;
+    }
 
     /* ── Main display ── */
     #main-wrap {
@@ -121,6 +131,16 @@
       text-shadow: 0 0 60px rgba(126,203,223,0.5);
     }
 
+    #word-display.flash.celebrity-mode {
+      color: #e84040;
+      text-shadow: 0 0 60px rgba(232,64,64,0.5);
+    }
+
+    #word-display.flash.random-mode {
+      color: #e8b830;
+      text-shadow: 0 0 60px rgba(232,184,48,0.5);
+    }
+
     .history {
       margin-top: 50px;
       color: #333;
@@ -139,8 +159,10 @@
 
   <!-- Channel switcher -->
   <div id="channel-bar">
-    <button class="ch-btn active" data-channel="dictionary" onclick="switchChannel('dictionary')">📖 Dictionary</button>
-    <button class="ch-btn atlas"  data-channel="atlas"      onclick="switchChannel('atlas')">🌍 Atlas</button>
+    <button class="ch-btn active" data-channel="dictionary" onclick="switchChannel('dictionary')">Dictionary</button>
+    <button class="ch-btn atlas"  data-channel="atlas"      onclick="switchChannel('atlas')">Atlas</button>
+    <button class="ch-btn celebrity" data-channel="celebrity" onclick="switchChannel('celebrity')">Celebrity</button>
+    <button class="ch-btn random" data-channel="random" onclick="switchChannel('random')">Random</button>
   </div>
 
   <div id="main-wrap">
@@ -160,6 +182,14 @@
     atlas: {
       url:   'https://global-search-stats-default-rtdb.firebaseio.com/chosenPlace.json',
       label: 'World Atlas',
+    },
+    celebrity: {
+      url:   'https://global-search-stats-default-rtdb.firebaseio.com/chosenCelebrity.json',
+      label: 'Celebrity',
+    },
+    random: {
+      url:   'https://global-search-stats-default-rtdb.firebaseio.com/chosenRandom.json',
+      label: 'Random Word',
     },
   };
 
@@ -183,10 +213,9 @@
     });
 
     channelLbl.textContent = CHANNELS[name].label;
-    if (name === 'atlas') {
-      display.classList.add('atlas-mode');
-    } else {
-      display.classList.remove('atlas-mode');
+    display.classList.remove('atlas-mode', 'celebrity-mode', 'random-mode');
+    if (name !== 'dictionary') {
+      display.classList.add(name + '-mode');
     }
 
     // reset display
@@ -206,12 +235,12 @@
     lastWord = word;
 
     clearTimeout(flashTimeout);
-    const isAtlas = currentChannel === 'atlas';
-    display.className = isAtlas ? 'atlas-mode' : '';
+    const modeClass = currentChannel !== 'dictionary' ? currentChannel + '-mode' : '';
+    display.className = modeClass;
     display.textContent = word;
 
     requestAnimationFrame(() => {
-      display.className = 'visible flash' + (isAtlas ? ' atlas-mode' : '');
+      display.className = 'visible flash' + (modeClass ? ' ' + modeClass : '');
       flashTimeout = setTimeout(() => {
         display.classList.remove('flash');
       }, 600);

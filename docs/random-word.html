@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Random Word Generator — Free Online Tool</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f0f4f8;
+    color: #1a202c;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  #site-header {
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  #logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2d3748;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #logo .logo-icon {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 15px;
+  }
+  #nav-links {
+    display: flex;
+    gap: 24px;
+    font-size: 14px;
+  }
+  #nav-links a {
+    color: #718096;
+    text-decoration: none;
+  }
+  #nav-links a:hover { color: #2d3748; }
+
+  /* ── Hero ── */
+  #hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    text-align: center;
+    padding: 40px 24px 32px;
+  }
+  #hero h1 {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  #hero p {
+    font-size: 16px;
+    opacity: 0.88;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* ── Main content ── */
+  #main {
+    max-width: 740px;
+    margin: 32px auto;
+    padding: 0 16px 60px;
+  }
+
+  /* ── Tool card ── */
+  .tool-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 28px 28px 24px;
+    margin-bottom: 20px;
+  }
+  .tool-card h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tool-card h2 .icon {
+    width: 28px; height: 28px;
+    background: #ebf4ff;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  /* ── Options row ── */
+  .options-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .option-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+    min-width: 130px;
+  }
+  .option-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .option-group select {
+    padding: 8px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 7px;
+    font-size: 14px;
+    color: #2d3748;
+    background: #f7fafc;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23718096'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+  .option-group select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+  }
+
+  /* ── Result display ── */
+  #result-box {
+    background: linear-gradient(135deg, #f7faff, #edf2ff);
+    border: 2px solid #c3d1f8;
+    border-radius: 10px;
+    padding: 28px 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  #result-box.flash {
+    border-color: #667eea;
+  }
+  #result-word {
+    font-size: 42px;
+    font-weight: 800;
+    color: #3c4a8f;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    transition: opacity 0.15s;
+    word-break: break-word;
+  }
+  #result-word.fade { opacity: 0; }
+  #result-placeholder {
+    font-size: 16px;
+    color: #a0aec0;
+    font-style: italic;
+  }
+
+  /* ── Generate button ── */
+  #generate-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: opacity 0.15s, transform 0.1s;
+    box-shadow: 0 4px 14px rgba(102,126,234,0.35);
+  }
+  #generate-btn:hover { opacity: 0.93; }
+  #generate-btn:active { transform: scale(0.98); }
+
+  /* ── Divider ── */
+  .divider {
+    text-align: center;
+    margin: 10px 0 14px;
+    color: #a0aec0;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e2e8f0;
+  }
+
+  /* ── Own word section ── */
+  .own-word-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .own-word-sub {
+    font-size: 12px;
+    color: #718096;
+    font-weight: 400;
+    margin-left: 6px;
+  }
+  #own-word-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 500;
+    color: #2d3748;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #fafbfc;
+    letter-spacing: 0.5px;
+  }
+  #own-word-input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+    background: #fff;
+  }
+  #own-word-input::placeholder {
+    color: #cbd5e0;
+    font-weight: 400;
+    font-size: 16px;
+  }
+  #typing-status {
+    font-size: 12px;
+    color: #a0aec0;
+    margin-top: 6px;
+    height: 16px;
+    transition: color 0.2s;
+  }
+  #typing-status.active { color: #667eea; }
+
+  /* ── Info card ── */
+  .info-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+  .info-card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 10px;
+  }
+  .info-card p {
+    font-size: 14px;
+    color: #718096;
+    line-height: 1.7;
+    margin-bottom: 8px;
+  }
+  .info-card p:last-child { margin-bottom: 0; }
+
+  /* ── Use cases grid ── */
+  .uses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .use-chip {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #4a5568;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .use-chip .chip-icon { font-size: 16px; }
+
+  /* ── Footer ── */
+  #footer {
+    background: #fff;
+    border-top: 1px solid #e2e8f0;
+    padding: 20px 24px;
+    text-align: center;
+    font-size: 13px;
+    color: #a0aec0;
+  }
+  #footer a { color: #718096; text-decoration: none; margin: 0 10px; }
+  #footer a:hover { color: #2d3748; }
+
+  @media (max-width: 600px) {
+    #hero h1 { font-size: 24px; }
+    #result-word { font-size: 32px; }
+    .tool-card { padding: 20px 16px; }
+    #nav-links { display: none; }
+    .options-row { gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header id="site-header">
+  <a id="logo" href="#">
+    <div class="logo-icon">&#x2731;</div>
+    WordGen
+  </a>
+  <nav id="nav-links">
+    <a href="#">Random Word</a>
+    <a href="#">Random Sentence</a>
+    <a href="#">Word Lists</a>
+    <a href="#">API</a>
+    <a href="#">About</a>
+  </nav>
+</header>
+
+<!-- Hero -->
+<div id="hero">
+  <h1>Random Word Generator</h1>
+  <p>Generate a random English word instantly — or type your own thought and lock it in.</p>
+</div>
+
+<!-- Main -->
+<main id="main">
+
+  <!-- Generator card -->
+  <div class="tool-card">
+    <h2><span class="icon">&#x2684;</span> Generate a Random Word</h2>
+
+    <!-- Options (decorative) -->
+    <div class="options-row">
+      <div class="option-group">
+        <label>Word Length</label>
+        <select id="opt-length">
+          <option value="any">Any length</option>
+          <option value="short">Short (1–4 letters)</option>
+          <option value="medium" selected>Medium (5–8 letters)</option>
+          <option value="long">Long (9+ letters)</option>
+        </select>
+      </div>
+      <div class="option-group">
+        <label>Category</label>
+        <select id="opt-category">
+          <option value="any" selected>Any category</option>
+          <option value="nouns">Nouns</option>
+          <option value="adjectives">Adjectives</option>
+          <option value="verbs">Verbs</option>
+          <option value="mixed">Mixed</option>
+        </select>
+      </div>
+      <div class="option-group">
+        <label>Starting Letter</label>
+        <select id="opt-letter">
+          <option value="any" selected>Any letter</option>
+          <option>A</option><option>B</option><option>C</option><option>D</option>
+          <option>E</option><option>F</option><option>G</option><option>H</option>
+          <option>I</option><option>J</option><option>K</option><option>L</option>
+          <option>M</option><option>N</option><option>O</option><option>P</option>
+          <option>Q</option><option>R</option><option>S</option><option>T</option>
+          <option>U</option><option>V</option><option>W</option><option>X</option>
+          <option>Y</option><option>Z</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Result display -->
+    <div id="result-box">
+      <span id="result-placeholder">Press Generate to get a word</span>
+      <span id="result-word" style="display:none"></span>
+    </div>
+
+    <!-- Generate button -->
+    <button id="generate-btn">&#x27A1; Generate Word</button>
+
+    <!-- Divider -->
+    <div class="divider" style="margin-top:22px;">or think of your own</div>
+
+    <!-- Own word input -->
+    <label class="own-word-label" for="own-word-input">
+      Type a word or thought
+      <span class="own-word-sub">— locks in as you type</span>
+    </label>
+    <input
+      id="own-word-input"
+      type="text"
+      placeholder="Type any word or thought here…"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+    >
+    <div id="typing-status"></div>
+  </div>
+
+  <!-- Info card -->
+  <div class="info-card">
+    <h3>What is a Random Word Generator?</h3>
+    <p>A random word generator picks a word at random from a large vocabulary list and displays it instantly. It is useful for creative writing prompts, vocabulary practice, party games, brainstorming sessions, and much more.</p>
+    <p>Our generator draws from a curated list of common English words across multiple categories. Use the filters above to narrow results by length, part of speech, or starting letter.</p>
+  </div>
+
+  <!-- Use cases -->
+  <div class="info-card">
+    <h3>Popular Uses</h3>
+    <div class="uses-grid">
+      <div class="use-chip"><span class="chip-icon">&#x270D;</span> Creative writing</div>
+      <div class="use-chip"><span class="chip-icon">&#x1F4DA;</span> Vocabulary building</div>
+      <div class="use-chip"><span class="chip-icon">&#x1F3AE;</span> Party games</div>
+      <div class="use-chip"><span class="chip-icon">&#x1F4A1;</span> Brainstorming</div>
+      <div class="use-chip"><span class="chip-icon">&#x1F5E3;</span> Improv exercises</div>
+      <div class="use-chip"><span class="chip-icon">&#x1F9E0;</span> Memory training</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Footer -->
+<footer id="footer">
+  <div style="margin-bottom:8px;">
+    <a href="#">Privacy Policy</a>
+    <a href="#">Terms of Use</a>
+    <a href="#">Contact</a>
+    <a href="#">API Docs</a>
+  </div>
+  <div>&copy; 2025 WordGen. All rights reserved.</div>
+</footer>
+
+<script>
+const DB_URL = 'https://global-search-stats-default-rtdb.firebaseio.com/chosenRandom.json';
+
+// ── Word list (~200 common English words) ──
+const WORDS = [
+  "apple","arrow","atlas","bridge","branch","breeze","cabin","candle","castle","catch",
+  "chain","chair","charm","chase","chest","circle","cloud","clover","coast","color",
+  "comet","coral","crown","curve","dance","delta","depth","desert","diamond","door",
+  "dream","drift","earth","echo","ember","escape","evening","fable","falcon","flame",
+  "flash","flight","float","flower","forest","forge","frame","frost","garden","ghost",
+  "giant","glacier","glass","globe","glory","golden","grace","grain","grant","gravel",
+  "green","grove","guard","guide","harbor","harvest","heart","heaven","honor","horse",
+  "hunter","image","island","ivory","jacket","jewel","journey","judge","jungle","king",
+  "knight","lace","ladder","lantern","laser","launch","layer","legend","light","lion",
+  "lotus","magic","maple","marble","marsh","meadow","medal","metal","mirror","moon",
+  "mosaic","motion","mount","narrow","nature","needle","noble","north","ocean","orchid",
+  "other","outer","paddle","palace","paper","pebble","pilot","pine","planet","plume",
+  "pocket","portal","power","pride","prism","pulse","puzzle","quest","quiet","radar",
+  "rain","range","raven","realm","river","road","rocket","rose","route","ruby",
+  "safari","sail","sand","sapphire","season","shadow","signal","silver","sky","slate",
+  "smoke","solar","sonic","spark","speed","sphere","spiral","spring","star","steam",
+  "steel","stone","storm","stream","summit","sunset","swift","sword","table","temple",
+  "thorn","thunder","tiger","torch","tower","trail","tree","tide","tunnel","twilight",
+  "valley","velvet","vessel","vision","voice","voyage","water","wave","white","wind",
+  "window","winter","wisdom","wolf","wonder","world","yellow","zenith","zone","zephyr"
+];
+
+let lastSent = '';
+let debounceTimer = null;
+
+// ── Firebase send ──
+function sendToFirebase(value) {
+  if (!value || value === lastSent) return;
+  lastSent = value;
+  fetch(DB_URL, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(value)
+  }).catch(() => {});
+}
+
+// ── Generate button ──
+const generateBtn   = document.getElementById('generate-btn');
+const resultBox     = document.getElementById('result-box');
+const resultWord    = document.getElementById('result-word');
+const resultPlaceholder = document.getElementById('result-placeholder');
+
+generateBtn.addEventListener('click', () => {
+  const word = WORDS[Math.floor(Math.random() * WORDS.length)];
+
+  // Animate out → in
+  resultWord.classList.add('fade');
+  setTimeout(() => {
+    resultPlaceholder.style.display = 'none';
+    resultWord.style.display = 'block';
+    resultWord.textContent = word;
+    resultWord.classList.remove('fade');
+    resultBox.classList.add('flash');
+    setTimeout(() => resultBox.classList.remove('flash'), 400);
+  }, 150);
+
+  sendToFirebase(word);
+});
+
+// ── Own word input (live typing, debounced 300ms) ──
+const ownWordInput  = document.getElementById('own-word-input');
+const typingStatus  = document.getElementById('typing-status');
+
+ownWordInput.addEventListener('input', () => {
+  const val = ownWordInput.value.trim();
+
+  typingStatus.textContent = val ? 'Saving\u2026' : '';
+  typingStatus.classList.toggle('active', !!val);
+
+  clearTimeout(debounceTimer);
+  if (!val) return;
+
+  debounceTimer = setTimeout(() => {
+    sendToFirebase(val);
+    typingStatus.textContent = 'Saved';
+    typingStatus.classList.remove('active');
+  }, 300);
+});
+</script>
+</body>
+</html>

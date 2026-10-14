@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Backstage Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0a0a0a;
+      color: #ccc;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 14px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #444;
+      margin-bottom: 40px;
+    }
+
+    .section {
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 36px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #555;
+      border-bottom: 1px solid #222;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+    }
+
+    .card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin-bottom: 8px;
+      text-decoration: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .card:hover {
+      border-color: #444;
+      background: #161616;
+    }
+
+    .card-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+      width: 40px;
+      text-align: center;
+    }
+
+    .card-info { flex: 1; }
+
+    .card-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #ddd;
+      margin-bottom: 2px;
+    }
+
+    .card-desc {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .card-link {
+      font-size: 11px;
+      color: #444;
+      font-family: monospace;
+      word-break: break-all;
+    }
+
+    .card-copy {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      color: #888;
+      padding: 5px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      border-radius: 3px;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .card-copy:hover { border-color: #2ecc71; color: #2ecc71; }
+    .card-copy.copied { border-color: #2ecc71; color: #2ecc71; }
+
+    .peek-btn {
+      display: block;
+      width: 100%;
+      max-width: 500px;
+      background: #111;
+      border: 1px solid #2ecc71;
+      color: #2ecc71;
+      padding: 16px;
+      font-size: 14px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 6px;
+      margin-top: 10px;
+      transition: background 0.15s;
+    }
+    .peek-btn:hover { background: #1a2a1a; }
+  </style>
+</head>
+<body>
+
+  <h1>Backstage Hub</h1>
+
+  <div class="section">
+    <div class="section-title">Spectator Pages — copy & send</div>
+
+    <div class="card" id="card-dictionary">
+      <div class="card-icon">📖</div>
+      <div class="card-info">
+        <div class="card-name">Dictionary</div>
+        <div class="card-desc">Oxford-style word browser — peek on hover</div>
+        <div class="card-link" id="link-dictionary"></div>
+      </div>
+      <button class="card-copy" onclick="copyLink('dictionary')">Copy</button>
+    </div>
+
+    <div class="card" id="card-atlas">
+      <div class="card-icon">🌍</div>
+      <div class="card-info">
+        <div class="card-name">Atlas</div>
+        <div class="card-desc">World Atlas — countries & cities on hover</div>
+        <div class="card-link" id="link-atlas"></div>
+      </div>
+      <button class="card-copy" onclick="copyLink('atlas')">Copy</button>
+    </div>
+
+    <div class="card" id="card-celebrity">
+      <div class="card-icon">⭐</div>
+      <div class="card-info">
+        <div class="card-name">Celebrities</div>
+        <div class="card-desc">100 Most Influential People — peek on hover</div>
+        <div class="card-link" id="link-celebrity"></div>
+      </div>
+      <button class="card-copy" onclick="copyLink('celebrity')">Copy</button>
+    </div>
+
+    <div class="card" id="card-random">
+      <div class="card-icon">🎲</div>
+      <div class="card-info">
+        <div class="card-name">Random Word</div>
+        <div class="card-desc">Word generator + free text — live typing peek</div>
+        <div class="card-link" id="link-random"></div>
+      </div>
+      <button class="card-copy" onclick="copyLink('random')">Copy</button>
+    </div>
+  </div>
+
+  <a class="peek-btn" href="performer.html">Open Peek Screen</a>
+
+<script>
+  const BASE = location.origin + location.pathname.replace(/\/[^/]*$/, '/');
+
+  const PAGES = {
+    dictionary: 'spectator.html',
+    atlas:      'atlas.html',
+    celebrity:  'celebrities.html',
+    random:     'random-word.html',
+  };
+
+  // Show links
+  Object.entries(PAGES).forEach(([key, file]) => {
+    document.getElementById('link-' + key).textContent = BASE + file;
+  });
+
+  function copyLink(key) {
+    const url = BASE + PAGES[key];
+    navigator.clipboard.writeText(url).then(() => {
+      const btn = document.querySelector(`#card-${key} .card-copy`);
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 1500);
+    });
+  }
+</script>
+
+</body>
+</html>
